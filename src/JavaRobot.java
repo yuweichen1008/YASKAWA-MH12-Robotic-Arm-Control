@@ -8,7 +8,7 @@ public class JavaRobot extends SendUDP {
     private boolean botReady = false;
     private boolean initial = false;
     private RobotAngle targetAngle;
-    private RobotPosition targetPosition = new RobotPosition();
+    private RobotPosition targetPosition;
     private RobotAngle currentAngle;
     private RobotPosition currentPosition;
     private int[] tool = new int[8];
@@ -120,6 +120,8 @@ public class JavaRobot extends SendUDP {
 
     // initialize JavaRobot with reading the tool(original position) first.
     private void setInitial() {
+	this.targetPosition = new RobotPosition();
+	this.targetAngle = new RobotAngle();
 	this.tool = read();
 	if (this.tool == null) {
 	    System.out.println("Didn't get the tool.");
@@ -250,69 +252,6 @@ public class JavaRobot extends SendUDP {
 	}
     }
 
-    // Inner class of Tool store information
-    class Tool {
-	private int toolnumber;
-	private int formnumber;
-	private int tZ;
-	private RobotPosition rectAngular;
-	private RobotAngle angular;
-
-	public Tool(int[] toolin) {
-	    this.formnumber = toolin[0];
-	    this.toolnumber = toolin[1];
-	    rectAngular = new RobotPosition(toolin[2], toolin[3], toolin[4]);
-	    angular = new RobotAngle(toolin[5], toolin[6]);
-
-	    this.tZ = toolin[7];
-	}
-
-	public Tool() {
-
-	}
-
-	public void setrX(int input) {
-	    rectAngular.setX(input);
-	}
-
-	public void setrY(int input) {
-	    rectAngular.setY(input);
-	}
-
-	public void setrZ(int input) {
-	    rectAngular.setZ(input);
-	}
-
-	public void setPitch(int input) {
-	    angular.setPhi(input);
-	}
-
-	public void setYaw(int input) {
-	    angular.setTheta(input);
-	}
-
-	public int[] getSetting() {
-	    int[] setting = { formnumber, toolnumber };
-	    return setting;
-	}
-
-	public int[] getPosition() {
-	    return rectAngular.getPosition();
-	}
-	//Pitch
-	public int getPhi() {
-	    return angular.getPhi();
-	}
-	//Yaw
-	public int getTheta() {
-	    return angular.getTheta();
-	}
-
-	public int getZr() {
-	    return this.tZ;
-	}
-    }
-
     // Inner class of RobotAngle contains yaw and pitch
     class RobotAngle {
 
@@ -389,68 +328,4 @@ public class JavaRobot extends SendUDP {
 	}
     }
 
-    public static void servoOn() {
-	Boolean sevo = JavaRobotServo.makeServo(1);// Servo ON
-	if (sevo) {
-	    System.out.println("Servo Start!");
-	}
-    }
-
-    public static void servoOff() {
-	Boolean sevo = JavaRobotServo.makeServo(2);// Servo OFF
-	if (sevo) {
-	    System.out.println("Servo Stop!");
-	}
-    }
-
-    public Boolean servo(int i) {
-	Boolean sevo = JavaRobotServo.makeServo(i);// 1 : Servo ON / 2: Servo
-						   // OFF
-	if (sevo && i == 1) {
-	    System.out.println("Servo Start!");
-	} else if (!(sevo) && i == 2) {
-	    System.out.println("Servo Off!");
-	} else {
-	    System.out.println("Servo failure");
-	}
-	return sevo;
-    }
-
-    public Boolean alert(int i) {
-	String alert = JavaRobotAlert.makeAlert(i);// 1 : Read Alert / 2 : Reset
-						   // Alert
-	Boolean returnBoolean = new Boolean(true);
-	if ((!"".equals(alert))) {
-	    returnBoolean = true;// Not any Alert happened
-	} else {
-	    returnBoolean = false;// There are Alert happened
-	}
-	return returnBoolean;
-    }
-
-    public static void holdOn() {
-	Boolean hold = JavaRobotHold.makeHold(1);// 1 : Hold ON
-	if (hold) {
-	    System.out.println("Hold ON! Yoo-hoo-hoo!");
-	}
-    }
-
-    public static void holdOff() {
-	Boolean hold = JavaRobotHold.makeHold(2);// 2 : Hold OFF
-	if (hold) {
-	    System.out.println("Hold OFF!");
-	}
-    }
-
-    public Boolean hold(int i) {
-	Boolean sevo = JavaRobotHold.makeHold(i);// 1 : Hold ON / 2 : Hold OFF
-	if (sevo && i == 1) {
-	    System.out.println("Hold ON! Yoo-hoo-hoo!");
-	} else if (!(sevo) && i == 2) {
-	    System.out.println("Hold Off!");
-	} else {
-	    System.out.println("Hold failure");
-	}
-	return sevo;
-    }
 }
