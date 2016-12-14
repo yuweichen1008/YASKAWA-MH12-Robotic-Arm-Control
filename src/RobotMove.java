@@ -109,9 +109,9 @@ public class RobotMove extends SendUDP{
     private void initialize(int speedin) {
 	isDone();
 	this.speed = speedin;
-	this.speedbyte = InttoByteArrayS(speed);
-	this.toolNumberbyte = InttoByteArrayS(toolNumber);
-	this.typeNumberbyte = InttoByteArrayS(typeNumber);
+	this.speedbyte = InttoByteArraySingle(speed);
+	this.toolNumberbyte = InttoByteArraySingle(toolNumber);
+	this.typeNumberbyte = InttoByteArraySingle(typeNumber);
 	this.coordinatebyte = InttoByteArray(coordinate);
 	this.anglebyte = InttoByteArray(angle);
 	this.coorbyte = InttoByteArray(coor);
@@ -184,62 +184,62 @@ public class RobotMove extends SendUDP{
 	this.displacement[4] = (toolnow[4] - this.tool[4]) / 1000;
 	// Pitch value
 	if (Math.abs(tZ) <= Math.abs(tX))
-	    this.displacement[5] = (-(9000 + tY)/100);
+	    this.displacement[5] = (-(9000 + tY/100));
 	else if (Math.abs(tZ) > Math.abs(tX))
-	    this.displacement[5] = (9000 + tY)/100;
+	    this.displacement[5] = (9000 + tY/100);
 	// Yaw value
 	if (tX >= 0 && tX * tZ >= 0) {
-	    this.displacement[6] = (tX + tZ - 18000)/100;
+	    this.displacement[6] = (tX/100 + tZ/100 - 18000);
 	} else if (tX < 0 && tZ >= 0) {
 	    if (Math.abs(tX) > Math.abs(tZ))
-		this.displacement[6] = ((18000 + tZ) - Math.abs(tX))/100;
+		this.displacement[6] = ((18000 + tZ/100) - Math.abs(tX)/100);
 	    else
-		this.displacement[6] = (tZ - (18000 - tX))/100;
+		this.displacement[6] = (tZ/100 - (18000 - tX/100));
 	} else if (tX > 0 && tZ < 0) {
 	    if (Math.abs(tZ) > Math.abs(tX))
-		this.displacement[6] = (tX + (18000 - Math.abs(tZ)))/100;
+		this.displacement[6] = (tX/100 + (18000 - Math.abs(tZ)/100));
 	    else
-		this.displacement[6] = (-(18000 - tX - tZ))/100;
+		this.displacement[6] = (-(18000 - tX/100 - tZ/100));
 	} else if (tX < 0 && tZ < 0) {
-	    this.displacement[6] = (tX + tZ + 18000)/100;
-	}
+	    this.displacement[6] = (tX/100 + tZ/100 + 18000);
 	// Tz value
+	}
 	this.displacement[7] = 0;
     }
 
-	public int[] read() {
-		RobotReadPosition robotread = new RobotReadPosition();
-		int[] toolout = robotread.read(); // To store the outcome of Tool
-		return toolout;
+    private int[] read() {
+	RobotReadPosition robotread = new RobotReadPosition();
+	int[] toolout = robotread.read(); // To store the outcome of Tool
+	return toolout;
+    }
+
+    // move function(main function)
+    public void move() throws Exception {
+	// Check whether there are placement first. If there are changes in
+	// placement, the function will stop after change the
+	// placement rather than move angular, you would have to call the
+	// function again.
+	System.out.print("Remaining Displacement ");
+	// To tell whether to move coordinate and move robot to the place first
+	if (this.coordinate[0] >= 100 || this.coordinate[1] >= 100 || this.coordinate[2] >= 100) {
+	    System.out.printf(" X : %d  Y : %d  Z : %d ", this.coordinate[0], this.coordinate[1], this.coordinate[2]);
+	    while (!(isDoneRec())) {
+		moveRect();// Move to the position first
+	    }
+	} else if (this.angle[0] >= 100 || this.angle[1] >= 100 || this.angle[2] >= 100) {
+	    System.out.println(" Angular Pitch : " + Math.floor(this.displacement[5]/1000) + "Yaw : " + Math.floor(this.displacement[6]/1000));
+	    while (!(isDoneAng())) {
+		movePitch(0); // Set Pitch to 0 first
+	    }
+	    while (!(isDoneAng())) {
+		moveYaw(this.angle[0]); // Yaw set to assigned value
+	    }
+	    while (!(isDoneAng())) {
+		movePitch(this.angle[1]); // Pitch set to assigned value
+	    }
 	}
 
-	// move function(main function)
-	public void move() throws Exception {
-		// Check whether there are placement first. If there are changes in
-		// placement, the function will stop after change the
-		// placement rather than move angular, you would have to call the
-		// function again.
-		System.out.print("Remaining Displacement ");
-		// To tell whether to move coordinate and move robot to the place first
-		if (this.coordinate[0] >= 100 || this.coordinate[1] >= 100 || this.coordinate[2] >= 100) {
-		    System.out.printf(" X : %d  Y : %d  Z : %d ", this.coordinate[0], this.coordinate[1], this.coordinate[2]);
-			while (!(isDoneRec())) {
-				moveRect();// Move to the position first
-			}
-		} else if (this.angle[0] >= 100 || this.angle[1] >= 100 || this.angle[2] >= 100) {
-		    System.out.printf(" AngularTz : %d Ty : %d \n ", this.angle[0], this.angle[1]);
-			while (!(isDoneAng())) {
-				movePitch(0); // Set Pitch to 0 first
-			}
-			while (!(isDoneAng())) {
-				moveYaw(this.angle[0]); // Yaw set to assigned value
-			}
-			while (!(isDoneAng())) {
-				movePitch(this.angle[1]); // Pitch set to assigned value
-			}
-		}
-
-	}
+    }
 
     private void moveRect() {
 	int[] anglemodified = { 0, 0, 0 };
@@ -289,7 +289,7 @@ public class RobotMove extends SendUDP{
     }
 
     private void movePitch(int pitch) {
-	this.isPitch = false; // Move pitch
+	this.isPitch = true; // Move pitch
 	int[] coordinatemodified = { 0, 0, 0 };
 	int[] anglemodified = new int[3];
 	anglemodified[0] = pitch;
@@ -320,7 +320,6 @@ public class RobotMove extends SendUDP{
 	 * isYaw or not
 	 */
 	ArrayList<Byte> arraylist = new ArrayList<Byte>();
-	byte[] returnbyte = new byte[] {};
 	// Command = [ Head,sub-head, Setting, Axis, Reserve, Type, Extend,
 	// ToolNo, Coordinate, Extension];
 	for (byte i : head)
@@ -355,33 +354,15 @@ public class RobotMove extends SendUDP{
 	    arraylist.add(i);
 	for (byte i : InttoByteArray(extension))
 	    arraylist.add(i);
-	for (int i = 0, len = arraylist.size(); i < len; i++)
-	    returnbyte[i] = arraylist.get(i);
-	// System.out.println("The Command in byte form is : " + returnbyte);//
-	// deBug ArrayList
-	return returnbyte;
-    }
 
-    // This function is type-transfer function from int to byte[]
-    private static byte[] InttoByteArrayS(int input) {
-	boolean isEmpty = true;
-	byte[] transfered = new byte[4];
-
-	ByteBuffer byteBuffer = ByteBuffer.allocate(4);
-	IntBuffer intBuffer = byteBuffer.asIntBuffer();
-	intBuffer.put(input);
-	transfered = byteBuffer.array();
-
-	for (byte b : transfered) {
-	    if (b != 0) {
-		isEmpty = false;
-		break;
+	byte[] returnbyte = new byte[arraylist.size()];
+	for (int i = 0, len = arraylist.size(); i < len; i++) {
+	    if (arraylist.get(i) != null) {
+		returnbyte[i] = arraylist.get(i);
 	    }
 	}
-	if (isEmpty) {
-	    return null;
-	} else {
-	    return transfered;
-	}
+	System.out.println("The Command in byte form is : " + returnbyte);//
+	// deBug ArrayList
+	return returnbyte;
     }
 }

@@ -84,11 +84,11 @@ public class JavaRobot extends SendUDP {
 			    targetPosition.getPosition()[2],targetAngle.getPhi(), targetAngle.getTheta(),this.tool, this.speed);
 		    rm.move();
 		    count++;
-		} else if (this.targetPosition.getPosition()[0] ==0 && this.targetPosition.getPosition()[1] ==0 && this.targetPosition.getPosition()[2] ==0 && this.targetAngle.getTheta() != 0 && this.targetAngle.getPhi() != 0) {
+		} else if (this.targetPosition.getPosition()[0] ==0 && this.targetPosition.getPosition()[1] ==0 && this.targetPosition.getPosition()[2] ==0 && this.targetAngle.getPhi() != 0 && this.targetAngle.getTheta() != 0) {
 		    RobotMove rm = new RobotMove(targetAngle.getPhi(),targetAngle.getTheta(), this.tool, this.speed);
 		    rm.move();
 		    count++;
-		} else if (this.targetPosition.getPosition()[0] ==0 && this.targetPosition.getPosition()[1] ==0 && this.targetPosition.getPosition()[2] ==0 && this.targetAngle.getTheta() == 0 && this.targetAngle.getPhi() == 0) {
+		} else if (this.targetPosition.getPosition()[0] ==0 && this.targetPosition.getPosition()[1] ==0 && this.targetPosition.getPosition()[2] ==0 && this.targetAngle.getPhi() != 0 && this.targetAngle.getTheta() == 0) {
 		    RobotMove rm = new RobotMove(this.tool, this.speed);
 		    rm.move();
 		    count++;
@@ -121,7 +121,9 @@ public class JavaRobot extends SendUDP {
     // initialize JavaRobot with reading the tool(original position) first.
     private void setInitial() {
 	this.targetPosition = new RobotPosition();
+	this.currentPosition = new RobotPosition();
 	this.targetAngle = new RobotAngle();
+	this.currentAngle = new RobotAngle();
 	this.tool = read();
 	if (this.tool == null) {
 	    System.out.println("Didn't get the tool.");
@@ -170,8 +172,8 @@ public class JavaRobot extends SendUDP {
 	int tX;
 	int tY;
 	int tZ;
-	 this.currentPosition = new RobotPosition(0, 0, 0);
-	 this.currentAngle = new RobotAngle(0, 0);
+	 this.currentPosition = new RobotPosition();
+	 this.currentAngle = new RobotAngle();
 	if (toolnow.length == 1 || toolnow == null) {
 	    // prevent the error code
 	    // prevent the error code
