@@ -93,7 +93,7 @@ public class UDPNode {
 		    socket.receive(response);
 		    if (response != null) {
 			this.flag = true;
-			System.out.println("Received data successfully!");
+			//System.out.println("Received data successfully!");
 			break;
 		    }
 		} catch (SocketTimeoutException e) {

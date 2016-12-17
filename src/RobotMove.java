@@ -144,6 +144,7 @@ public class RobotMove extends SendUDP{
 		    || Math.abs(this.displacement[4]) >= 1000 || Math.abs(this.displacement[5]) >= 100
 		    || Math.abs(this.displacement[6]) >= 100) {
 		this.isDone = false;
+		break;
 	    } else {
 		this.isDone = true;
 	    }
@@ -153,23 +154,25 @@ public class RobotMove extends SendUDP{
     }
 
     public boolean isDoneRec() {
+	robotDisplacement();
 	if (Math.abs(this.displacement[2]) >= 1000 || Math.abs(this.displacement[3]) >= 1000
 		|| Math.abs(this.displacement[4]) >= 1000) {
 	    this.isDone = false;
 	} else {
 	    this.isDone = true;
 	}
-
+	System.out.printf("Remaining Displacement  X : %d  Y : %d  Z : %d ", this.coordinate[0], this.coordinate[1], this.coordinate[2]);
 	return this.isDone;
     }
 
     public boolean isDoneAng() {
+	robotDisplacement();
 	if (Math.abs(this.displacement[5]) >= 100 || Math.abs(this.displacement[6]) >= 100) {
 	    this.isDone = false;
 	} else {
 	    this.isDone = true;
 	}
-
+	System.out.println("Remaining Angular Pitch : " + Math.floor(this.displacement[5]/1000) + "Yaw : " + Math.floor(this.displacement[6]/1000));
 	return this.isDone;
     }
 
@@ -219,16 +222,15 @@ public class RobotMove extends SendUDP{
 	// placement, the function will stop after change the
 	// placement rather than move angular, you would have to call the
 	// function again.
-	System.out.print("Remaining Displacement ");
 	// To tell whether to move coordinate and move robot to the place first
+	try{
 	if (this.coordinate[0] >= 100 || this.coordinate[1] >= 100 || this.coordinate[2] >= 100) {
-	    System.out.printf(" X : %d  Y : %d  Z : %d ", this.coordinate[0], this.coordinate[1], this.coordinate[2]);
 	    while (!(isDoneRec())) {
 		moveRect();// Move to the position first
 	    }
 	} else if (this.angle[0] >= 100 || this.angle[1] >= 100 || this.angle[2] >= 100) {
-	    System.out.println(" Angular Pitch : " + Math.floor(this.displacement[5]/1000) + "Yaw : " + Math.floor(this.displacement[6]/1000));
 	    while (!(isDoneAng())) {
+		
 		movePitch(0); // Set Pitch to 0 first
 	    }
 	    while (!(isDoneAng())) {
@@ -238,7 +240,9 @@ public class RobotMove extends SendUDP{
 		movePitch(this.angle[1]); // Pitch set to assigned value
 	    }
 	}
-
+	} catch(NullPointerException e){
+	    System.out.println("You don't get the tool");
+	}
     }
 
     private void moveRect() {
@@ -361,7 +365,7 @@ public class RobotMove extends SendUDP{
 		returnbyte[i] = arraylist.get(i);
 	    }
 	}
-	System.out.println("The Command in byte form is : " + returnbyte);//
+	//System.out.println("The Command in byte form is : " + returnbyte);//
 	// deBug ArrayList
 	return returnbyte;
     }

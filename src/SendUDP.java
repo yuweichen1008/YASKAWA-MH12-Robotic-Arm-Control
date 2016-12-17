@@ -8,21 +8,6 @@ import java.nio.IntBuffer;
 
 public abstract class SendUDP extends Thread {
 	private byte[] command = new byte[] {};
-	private static byte[] readInt = { 89, 69, 82, 67, 32, 00, 00, 00, 03, 01, 00, 00, 00, 00, 00, 00, 57, 57, 57, 57,
-			57, 57, 57, 57, 117, 00, 101, 00, 00, 01, 00, 00 };// Read Position
-	private static byte[] readPositionCommand = {};
-	private static byte[] commandAlertRead = { 89, 69, 82, 67, 32, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57,
-			57, 57, 57, 112, 0, 1, 0, 0, 1, 0, 0 };
-	private static byte[] commandAlertReset = { 89, 69, 82, 67, 32, 0, 4, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57,
-			57, 57, 57, -126, 0, 1, 0, 1, 16, 0, 0, 1, 0, 0, 0 };
-	private byte[] commandServoOn = { 89, 69, 82, 67, 32, 0, 4, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57, 57, 57,
-			57, -125, 0, 2, 0, 1, 16, 0, 0, 1, 0, 0, 0 };
-	private byte[] commandServoOFF = { 89, 69, 82, 67, 32, 0, 4, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57, 57, 57,
-			57, -125, 0, 2, 0, 1, 16, 0, 0, 2, 0, 0, 0 };
-	private static byte[] commandHoldOn = { 89, 69, 82, 67, 32, 0, 4, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57, 57,
-			57, 57, -125, 0, 1, 0, 1, 16, 0, 0, 1, 0, 0, 0 };
-	private static byte[] commandHoldOff = { 89, 69, 82, 67, 32, 0, 4, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57,
-			57, 57, 57, -125, 0, 1, 0, 1, 16, 0, 0, 2, 0, 0, 0 };
 
 	// Constructor
 	public SendUDP() {
@@ -44,42 +29,24 @@ public abstract class SendUDP extends Thread {
 		this.command = byteComm;
 	}
 
-	public SendUDP(int index) {
-		switch (index) {
-		case 1:
-			this.command = readPositionCommand;
-			//System.out.println("Read Position command set!");
-			break;
-		case 2:
-			this.command = commandAlertRead;
-			//System.out.println("Read Alert command set!");
-			break;
-		case 3:
-			this.command = commandAlertReset;
-			//System.out.println("Reset Alert command set!");
-			break;
-		case 4:
-			this.command = commandServoOn;
-			//System.out.println("Servo ON command set!");
-			break;
-		case 5:
-			this.command = commandServoOFF;
-			//System.out.println("Servo OFF command set!");
-			break;
-		case 6:
-			this.command = commandHoldOn;
-			//System.out.println("Hold ON command set!");
-			break;
-		case 7:
-			this.command = commandHoldOff;
-			//System.out.println("Hold OFF command set!");
-			break;
-		default:
-			this.command = readInt;
-			//System.out.println("Read Position command set!");
-			break;
+	public byte[] send(byte[] command) throws Exception {
+		UDPNode Command = new UDPNode(command);
+		byte[] response = new byte[] {};
+		try {
+			response = Command.submit();
+			if (byteArrayToInt(response)[0] == 0) {
+				System.out.println("Cannot get response");
+				Thread.sleep(10);
+				return new byte[] { 0 };
+			} else {
+				Thread.sleep(200);
+				return swap(response);
+			}
+		} catch (SocketTimeoutException e) {
+			System.out.println("Cannot get response");
+			Thread.sleep(10);
+			return new byte[] { 0 };
 		}
-
 	}
 
 	public byte[] send() throws Exception {
@@ -92,7 +59,7 @@ public abstract class SendUDP extends Thread {
 				Thread.sleep(10);
 				return new byte[] { 0 };
 			} else {
-				Thread.sleep(10);
+				Thread.sleep(200);
 				return swap(response);
 			}
 		} catch (SocketTimeoutException e) {
@@ -102,6 +69,26 @@ public abstract class SendUDP extends Thread {
 		}
 	}
 
+	public int[] sendint(byte[] command) throws Exception {
+		UDPNode Command = new UDPNode(command);
+		byte[] response = new byte[] {};
+		try {
+			response = Command.submit();
+			if (byteArrayToInt(response)[0] == 0) {
+				System.out.println("Cannot get response");
+				Thread.sleep(10);
+				return new int[] { 0 };
+			} else {
+				Thread.sleep(200);
+				return byteToint32(response);
+			}
+		} catch (SocketTimeoutException e) {
+			System.out.println("Cannot get response");
+			Thread.sleep(10);
+			return new int[] { 0 };
+		}
+	}
+	
 	public int[] sendint() throws Exception {
 		UDPNode Command = new UDPNode(command);
 		byte[] response = new byte[] {};
@@ -112,7 +99,7 @@ public abstract class SendUDP extends Thread {
 				Thread.sleep(10);
 				return new int[] { 0 };
 			} else {
-				Thread.sleep(10);
+				Thread.sleep(200);
 				return byteToint32(response);
 			}
 		} catch (SocketTimeoutException e) {
@@ -122,19 +109,23 @@ public abstract class SendUDP extends Thread {
 		}
 	}
 
-	public int[] byteArrayToInt(byte[] b) {
-		if (b != null) {
-			int[] transfered = new int[(b.length) / 4];
-			for (int j = 0; j < (b.length / 4); j++) {
-				transfered[j] = b[(j * 4) + 3] & 0xFF | (b[(j * 4) + 2] & 0xFF) << 8 | (b[(j * 4) + 1] & 0xFF) << 16
-						| (b[(j * 4) + 0] & 0xFF) << 24;
+    /*
+     * Below here are functions to deal with byte, int8, int32 and String array
+     * transformation
+     */
+    public int[] byteArrayToInt(byte[] b) {
+	if (b != null) {
+	    int[] transfered = new int[(b.length) / 4];
+	    for (int j = 0; j < (b.length / 4); j++) {
+		transfered[j] = b[(j * 4) + 3] & 0xFF | (b[(j * 4) + 2] & 0xFF) << 8 | (b[(j * 4) + 1] & 0xFF) << 16
+			| (b[(j * 4) + 0] & 0xFF) << 24;
 
-			}
-			return transfered;
-		} else {
-			return null;
-		}
+	    }
+	    return transfered;
+	} else {
+	    return null;
 	}
+    }
 
     public byte[] InttoByteArray(int[] inputIntArray) {
 	byte[] transfered = new byte[(inputIntArray.length * 4)];

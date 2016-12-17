@@ -79,31 +79,38 @@ public class JavaRobot extends SendUDP {
 	try {
 	    while (!(getReady())) {
 		setReady(robotReady());
-		if (this.targetPosition.getPosition()[0] !=0 && this.targetPosition.getPosition()[1] !=0 && this.targetPosition.getPosition()[2] !=0) {
+		if (this.targetPosition.getPosition()[0] != 0 && this.targetPosition.getPosition()[1] != 0
+			&& this.targetPosition.getPosition()[2] != 0) {
 		    RobotMove rm = new RobotMove(targetPosition.getPosition()[0], targetPosition.getPosition()[1],
-			    targetPosition.getPosition()[2],targetAngle.getPhi(), targetAngle.getTheta(),this.tool, this.speed);
+			    targetPosition.getPosition()[2], targetAngle.getPhi(), targetAngle.getTheta(), this.tool,
+			    this.speed);
 		    rm.move();
-		    count++;
-		} else if (this.targetPosition.getPosition()[0] ==0 && this.targetPosition.getPosition()[1] ==0 && this.targetPosition.getPosition()[2] ==0 && this.targetAngle.getPhi() != 0 && this.targetAngle.getTheta() != 0) {
-		    RobotMove rm = new RobotMove(targetAngle.getPhi(),targetAngle.getTheta(), this.tool, this.speed);
+
+		} else if (this.targetPosition.getPosition()[0] == 0 && this.targetPosition.getPosition()[1] == 0
+			&& this.targetPosition.getPosition()[2] == 0 && this.targetAngle.getPhi() != 0
+			&& this.targetAngle.getTheta() != 0) {
+		    RobotMove rm = new RobotMove(targetAngle.getPhi(), targetAngle.getTheta(), this.tool, this.speed);
 		    rm.move();
-		    count++;
-		} else if (this.targetPosition.getPosition()[0] ==0 && this.targetPosition.getPosition()[1] ==0 && this.targetPosition.getPosition()[2] ==0 && this.targetAngle.getPhi() != 0 && this.targetAngle.getTheta() == 0) {
+
+		} else if (this.targetPosition.getPosition()[0] == 0 && this.targetPosition.getPosition()[1] == 0
+			&& this.targetPosition.getPosition()[2] == 0 && this.targetAngle.getPhi() != 0
+			&& this.targetAngle.getTheta() == 0) {
 		    RobotMove rm = new RobotMove(this.tool, this.speed);
 		    rm.move();
-		    count++;
+
 		} else {
 		    setReady(true);
-		    System.out.println(
-			    "We cannot get the tool information from Robot, please check the connection or contact Y.W. Chen");
+		    System.out.println("Cannot get the tool information from Robot, please check the connection or contact Y.W. Chen");
 		    break;
 		}
 		Thread.sleep(100);// pause
-		System.out.println("Pause " + count + " times");
+		System.out.println("Pause " + count++ + " times");
 	    }
 	} catch (IOException e) {
 	    e.printStackTrace();
-	} catch (Exception e) {
+	} catch(NullPointerException e){
+	    System.out.println("You don't get the tool, please check your connection. JavaRobot.moveTo() has stopped!!");
+	}catch (Exception e) {
 	    e.printStackTrace();
 	}
     }
@@ -149,13 +156,13 @@ public class JavaRobot extends SendUDP {
     public void ask(){
 	if (this.currentPosition.getPosition()[0] <= 1000 && this.currentPosition.getPosition()[1] <= 1000
 		&& this.currentPosition.getPosition()[2] <= 1000) {
-	    System.out.println("X is : " + this.currentPosition.getPosition()[0] + ", Y is : "
+	    System.out.println("Current X is : " + this.currentPosition.getPosition()[0] + ", Y is : "
 		    + this.currentPosition.getPosition()[1] + ", Z is : " + this.currentPosition.getPosition()[2]);
 	    System.out.println(
-		    "Pitch is : " + this.currentAngle.getPhi() + " and Yaw is : " + this.currentAngle.getTheta());
+		    "Current Pitch is : " + this.currentAngle.getPhi() + " and Yaw is : " + this.currentAngle.getTheta());
 	} else {
 	    System.out.println(
-		    "Pitch is : " + this.currentAngle.getPhi() + " and Yaw is : " + this.currentAngle.getTheta());
+		    "Current Pitch is : " + this.currentAngle.getPhi() + " and Yaw is : " + this.currentAngle.getTheta());
 	}
 	
     }
@@ -166,14 +173,12 @@ public class JavaRobot extends SendUDP {
 	return isCloseTo(); // return the boolean value of previous description
     }
 
-    public void askCurrent() {
+    private void askCurrent() {
 	int[] displacement = new int[6];
 	int[] toolnow = read();
 	int tX;
 	int tY;
 	int tZ;
-	 this.currentPosition = new RobotPosition();
-	 this.currentAngle = new RobotAngle();
 	if (toolnow.length == 1 || toolnow == null) {
 	    // prevent the error code
 	    // prevent the error code
