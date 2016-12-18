@@ -10,7 +10,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 public class UDPNode {
-    String host = "192.168.1.58"; // Robot IPAddress
+    String host = "192.168.11.2"; // Robot IPAddress
     private int port = 10040; // Computer's Port
     private int robotPort = 10041; // Robot's Port
     private int timeOut = 1000; // Default 1 second

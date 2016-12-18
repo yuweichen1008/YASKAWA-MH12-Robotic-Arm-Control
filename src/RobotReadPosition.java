@@ -36,7 +36,7 @@ public class RobotReadPosition extends SendUDP {
 		return null;
 	    } else {
 		// System.out.println("respnse = " + response.toString());
-		System.out.println("Return has length " + response.length);
+		//System.out.println("Return has length " + response.length);
 		if (response.length != 64) {
 		    return null;
 		}
