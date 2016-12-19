@@ -11,9 +11,6 @@
 public class RobotReadPosition extends SendUDP {
 	private static int[] command = { 1497715267, 536870912, 50397184, 0, 960051513, 960051513, 1962960128, 65536 };
 	public int[] tool = new int[8];
-	private Boolean read = new Boolean(false);
-	private int yawDifference = 0;
-	private int pitchDifference = 0;
 
 	// Constructor of RobotReadPosition
 	public RobotReadPosition() {
@@ -61,58 +58,20 @@ public class RobotReadPosition extends SendUDP {
 			this.tool[7] = response[i]; // Zr
 		    }
 
+				}
+				// deal with response with SendUDP's public funuction to
+				// generate int32 information in tool, which contains
+				// [Tool_no,Form,X,Y,Z,Xr,Yr,Zr], please deal with this in int32
+				// form and i will modified the data in RobotMove and JavaRobot
+				// functions.
+				return this.tool;
+			}
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
-		this.read = true;
-		// deal with response with SendUDP's public funuction to
-		// generate int32 information in tool, which contains
-		// [Tool_no,Form,X,Y,Z,Xr,Yr,Zr], please deal with this in int32
-		// form and i will modified the data in RobotMove and JavaRobot
-		// functions.
-		return this.tool;
-	    }
-	} catch (NullPointerException e) {
-	    e.printStackTrace();
-	    return null;
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    return null;
 	}
-    }
-
-    //
-    public int[] getPosition() {
-	if (this.read.booleanValue() == true) {
-	    int[] position = new int[3];
-	    position[0] = tool[3];
-	    position[1] = tool[4];
-	    position[2] = tool[5];
-	    return position;
-	} else {
-	    System.out.println("You have to read() first! If you still have any problems, please refer to the note.");
-	    return null;
-	}
-    }
-
-    public int[] getAngle() {
-	if (this.read.booleanValue() == true) {
-	    RobotReadPosition get = new RobotReadPosition(this.tool);
-	    int[] angle = new int[2];
-	    int[] response;
-	    try {
-		response = byteToint32(get.send());
-		yawDifference = this.tool[5] - response[16]; // yaw
-		pitchDifference = this.tool[6] - response[17]; // pitch
-	    } catch (Exception e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
-	    angle[0] = yawDifference;
-	    angle[1] = pitchDifference;
-	    return angle;
-	} else {
-	    System.out.println("You have to read() first! If you still have any problems, please refer to the note.");
-	    return null;
-	}
-    }
-
 }

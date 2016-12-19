@@ -140,84 +140,114 @@ public class RobotMove extends SendUDP {
 
 	public boolean isDone() {
 		robotDisplacement();
-		for (int i = 2; i < 5; i++) {
-			if (Math.abs(this.coordinate[0] - this.displacement[2]) >= 1000
-					|| Math.abs(this.coordinate[1] - this.displacement[3]) >= 1000
-					|| Math.abs(this.coordinate[2] - this.displacement[4]) >= 1000
-					|| Math.abs(this.displacement[5]) >= 100 || Math.abs(this.displacement[6]) >= 100) {
-				this.isDone = false;
-				break;
-			} else {
-				this.isDone = true;
+		if (this.displacement[0] == 9999 && this.displacement[1] == 9999 && this.displacement[2] == 9999
+				|| this.displacement[5] == 9999 && this.displacement[6] == 9999) {
+			return true; // True to stop the loop
+		} else {
+			for (int i = 2; i < 5; i++) {
+				if (Math.abs(this.coordinate[0] - this.displacement[2]) >= 1000
+						|| Math.abs(this.coordinate[1] - this.displacement[3]) >= 1000
+						|| Math.abs(this.coordinate[2] - this.displacement[4]) >= 1000
+						|| Math.abs(this.displacement[5]) >= 100 || Math.abs(this.displacement[6]) >= 100) {
+					this.isDone = false;
+					break;
+				} else {
+					this.isDone = true;
+				}
 			}
-		}
 
-		return this.isDone;
+			return this.isDone;
+		}
 	}
 
 	public boolean isDoneRec() {
 		robotDisplacement();
-		if (Math.abs(this.coordinate[0] - this.displacement[2]) >= 1000
-				|| Math.abs(this.coordinate[1] - this.displacement[3]) >= 1000
-				|| Math.abs(this.coordinate[2] - this.displacement[4]) >= 1000) {
-			this.isDone = false;
+		if (this.displacement[2] == 9999 && this.displacement[3] == 9999 && this.displacement[4] == 9999) {
+			return true; // True to stop the loop
 		} else {
-			this.isDone = true;
+			if (Math.abs(this.coordinate[0] - this.displacement[2]) >= 1000
+					|| Math.abs(this.coordinate[1] - this.displacement[3]) >= 1000
+					|| Math.abs(this.coordinate[2] - this.displacement[4]) >= 1000) {
+				this.isDone = false;
+			} else {
+				this.isDone = true;
+			}
+			System.out.printf("Remaining Displacement  X : %d  Y : %d  Z : %d ",
+					(this.coordinate[0] - this.displacement[2]), (this.coordinate[1] - this.displacement[3]),
+					(this.coordinate[2] - this.displacement[4]));
+			return this.isDone;
 		}
-		System.out.printf("Remaining Displacement  X : %d  Y : %d  Z : %d ",
-				(this.coordinate[0] - this.displacement[2]), (this.coordinate[1] - this.displacement[3]),
-				(this.coordinate[2] - this.displacement[4]));
-		return this.isDone;
 	}
 
 	public boolean isDoneAng(int index) {
 		// index == 0 : pitch
 		// index == 1 : yaw
-		
 		robotDisplacement();
-		if (Math.abs(this.angle[0] - this.displacement[5]) >= 100
-				|| Math.abs(this.angle[1] - this.displacement[6]) >= 100) {
-			this.isDone = false;
+		if (this.displacement[5] == 9999 && this.displacement[6] == 9999) {
+			return true; // True to stop the loop
 		} else {
-			this.isDone = true;
+			if (index == 0) {
+				if (Math.abs(this.angle[0] - this.displacement[5]) >= 100) {
+					this.isDone = false;
+				} else {
+					this.isDone = true;
+				}
+
+			} else if (index == 1) {
+				if (Math.abs(this.angle[1] - this.displacement[6]) >= 100) {
+					this.isDone = false;
+				} else {
+					this.isDone = true;
+				}
+			} else {
+				System.out.println("Error calling isDoneAng! index should be 1 or 2.");
+				return false;
+			}
+			System.out.println("Remaining Angular Pitch : " + Math.floor((this.angle[0] - this.displacement[5]) / 1000)
+					+ "Yaw : " + Math.floor((this.angle[1] - this.displacement[6]) / 1000));
+			return this.isDone;
 		}
-		System.out.println("Remaining Angular Pitch : " + Math.floor((this.angle[0] - this.displacement[5]) / 1000)
-				+ "Yaw : " + Math.floor((this.angle[1] - this.displacement[6]) / 1000));
-		return this.isDone;
 	}
 
 	public void robotDisplacement() {
 		int[] toolnow = read();
-		int tX = toolnow[2];
-		int tY = toolnow[3];
-		int tZ = toolnow[4];
+		if (toolnow == null) {
+			for (int i = 2; i < 7; i++) {
+				this.displacement[i] = 9999;
+			}
 
-		this.displacement[2] = (toolnow[2] - this.tool[2]);
-		this.displacement[3] = (toolnow[3] - this.tool[3]);
-		this.displacement[4] = (toolnow[4] - this.tool[4]);
-		// Pitch value
-		if (Math.abs(tZ) <= Math.abs(tX))
-			this.displacement[5] = (-(9000 + tY / 100));
-		else if (Math.abs(tZ) > Math.abs(tX))
-			this.displacement[5] = (9000 + tY / 100);
-		// Yaw value
-		if (tX >= 0 && tX * tZ >= 0) {
-			this.displacement[6] = (tX / 100 + tZ / 100 - 18000);
-		} else if (tX < 0 && tZ >= 0) {
-			if (Math.abs(tX) > Math.abs(tZ))
-				this.displacement[6] = ((18000 + tZ / 100) - Math.abs(tX) / 100);
-			else
-				this.displacement[6] = (tZ / 100 - (18000 - tX / 100));
-		} else if (tX > 0 && tZ < 0) {
-			if (Math.abs(tZ) > Math.abs(tX))
-				this.displacement[6] = (tX / 100 + (18000 - Math.abs(tZ) / 100));
-			else
-				this.displacement[6] = (-(18000 - tX / 100 - tZ / 100));
-		} else if (tX < 0 && tZ < 0) {
-			this.displacement[6] = (tX / 100 + tZ / 100 + 18000);
-			// Tz value
+		} else {
+			int tX = toolnow[2];
+			int tY = toolnow[3];
+			int tZ = toolnow[4];
+
+			this.displacement[2] = (toolnow[2] - this.tool[2]);
+			this.displacement[3] = (toolnow[3] - this.tool[3]);
+			this.displacement[4] = (toolnow[4] - this.tool[4]);
+			// Pitch value
+			if (Math.abs(tZ) <= Math.abs(tX))
+				this.displacement[5] = -(9000 + tY);
+			else if (Math.abs(tZ) > Math.abs(tX))
+				this.displacement[5] = (9000 + tY);
+			// Yaw value
+			if (tX >= 0 && tX * tZ >= 0) {
+				this.displacement[6] = ((tX + tZ) - 18000);
+			} else if (tX < 0 && tZ >= 0) {
+				if (Math.abs(tX) > Math.abs(tZ))
+					this.displacement[6] = ((18000 + tZ) - Math.abs(tX));
+				else
+					this.displacement[6] = (tZ - (18000 - tX));
+			} else if (tX > 0 && tZ < 0) {
+				if (Math.abs(tZ) > Math.abs(tX))
+					this.displacement[6] = (tX + (18000 - Math.abs(tZ)));
+				else
+					this.displacement[6] = -(18000 - tX - tZ);
+			} else if (tX < 0 && tZ < 0) {
+				this.displacement[6] = (tX + tZ + 18000);
+				// Tz value
+			}
+			this.displacement[7] = 0;
 		}
-		this.displacement[7] = 0;
 	}
 
 	private int[] read() {
