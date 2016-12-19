@@ -106,7 +106,7 @@ public class RobotMove extends SendUDP {
     // This function is to assign the Byte[] to each type of parameter which
     // required in generate command
     private void initialize(int speedin) {
-	isDone();
+	robotDisplacement();
 	this.speed = speedin;
 	this.speedbyte = InttoByteArraySingle(speed);
 	this.toolNumberbyte = InttoByteArraySingle(toolNumber);
@@ -136,63 +136,50 @@ public class RobotMove extends SendUDP {
 	return this.tool;
     }
 
-    public boolean isDone() {
-	robotDisplacement();
-	if (this.displacement[0] == 9999 && this.displacement[1] == 9999 && this.displacement[2] == 9999
-		|| this.displacement[5] == 9999 && this.displacement[6] == 9999) {
-	    return true; // True to stop the loop
-	} else {
-	    for (int i = 2; i < 5; i++) {
-		if (Math.abs(this.coordinate[0] - this.displacement[2]) >= 1000
-			|| Math.abs(this.coordinate[1] - this.displacement[3]) >= 1000
-			|| Math.abs(this.coordinate[2] - this.displacement[4]) >= 1000
-			|| Math.abs(this.displacement[5]) >= 100 || Math.abs(this.displacement[6]) >= 100) {
-		    this.isDone = false;
-		    break;
-		} else {
-		    this.isDone = true;
-		}
-	    }
-
-	    return this.isDone;
-	}
-    }
-
-    public boolean isDoneRec() {
+    private boolean isDoneRec() {
 	robotDisplacement();
 	if (this.displacement[2] == 9999 && this.displacement[3] == 9999 && this.displacement[4] == 9999) {
 	    return true; // True to stop the loop
 	} else {
-	    if (Math.abs(this.coordinate[0] - this.displacement[2]) >= 1000
-		    || Math.abs(this.coordinate[1] - this.displacement[3]) >= 1000
-		    || Math.abs(this.coordinate[2] - this.displacement[4]) >= 1000) {
+	    if (Math.abs(this.coordinate[0] - this.displacement[2]/1000) >= 1
+		    || Math.abs(this.coordinate[1] - this.displacement[3]/1000) >= 1
+		    || Math.abs(this.coordinate[2] - this.displacement[4]/1000) >= 1) {
 		this.isDone = false;
 	    } else {
 		this.isDone = true;
 	    }
-	    System.out.printf("Remaining Displacement  X : %d  Y : %d  Z : %d ",
-		    (this.coordinate[0] - this.displacement[2]), (this.coordinate[1] - this.displacement[3]),
-		    (this.coordinate[2] - this.displacement[4]));
+	    System.out.printf("Remaining Displacement  X : %d mm  Y : %d mm Z : %d mm.",
+		    (this.coordinate[0] - this.displacement[2]/1000), (this.coordinate[1] - this.displacement[3]/1000),
+		    (this.coordinate[2] - this.displacement[4]/1000));
 	    return this.isDone;
 	}
     }
 
-    public boolean isDoneAng(int index) {
-	// index == 0 : pitch
-	// index == 1 : yaw
+    private boolean isDoneAng(int index) {
+	// index == 0 : pitch to 0
+	// index == 1 : yaw to certain value
+	// index == 2 : pitch to certain value
 	robotDisplacement();
 	if (this.displacement[5] == 9999 && this.displacement[6] == 9999) {
 	    return true; // True to stop the loop
 	} else {
 	    if (index == 0) {
-		if (Math.abs(this.angle[0] - this.displacement[5]) >= 100) {
+		// Set pitch to 0
+		if (Math.abs(0 - this.displacement[6]) >= 100) {
 		    this.isDone = false;
 		} else {
 		    this.isDone = true;
 		}
-
 	    } else if (index == 1) {
+		// Set yaw to value this.angle[1]
 		if (Math.abs(this.angle[1] - this.displacement[6]) >= 100) {
+		    this.isDone = false;
+		} else {
+		    this.isDone = true;
+		}
+	    } else if (index == 2) {
+		// Set pitch to value this.angle[0]
+		if (Math.abs(this.angle[0] - this.displacement[5]) >= 100) {
 		    this.isDone = false;
 		} else {
 		    this.isDone = true;
@@ -201,8 +188,8 @@ public class RobotMove extends SendUDP {
 		System.out.println("Error calling isDoneAng! index should be 1 or 2.");
 		return false;
 	    }
-	    System.out.println("Remaining Angular Pitch : " + Math.floor((this.angle[0] - this.displacement[5]) / 1000)
-		    + "Yaw : " + Math.floor((this.angle[1] - this.displacement[6]) / 1000));
+	    System.out.println("Remaining Angular Pitch : " + Math.floor((this.angle[0] - this.displacement[5]/100))
+		    + " centidegrees Yaw : " + Math.floor((this.angle[1] - this.displacement[6]/100)) + " centidegrees.");
 	    return this.isDone;
 	}
     }
@@ -223,7 +210,7 @@ public class RobotMove extends SendUDP {
 	    int tX = toolnow[2] / 100;
 	    int tY = toolnow[3] / 100;
 	    int tZ = toolnow[4] / 100;
-
+	    // Pitch value
 	    if (Math.abs(tZ) <= Math.abs(tX))
 		this.displacement[5] = -(9000 + tY);
 	    else if (Math.abs(tZ) > Math.abs(tX))
@@ -246,6 +233,9 @@ public class RobotMove extends SendUDP {
 		// Tz value
 	    }
 	    this.displacement[7] = 0;
+	    System.out.println("Displacement X : " + this.displacement[2] / 1000 + " mm, Y : " + this.displacement[3] /1000 + " Z : "
+		    + this.displacement[4] / 1000 + " mm, Pitch : " + this.displacement[5] / 100+ " centidegrees, Yaw : "
+		    + this.displacement[6] /100 + " centidegrees.");
 	}
     }
 
@@ -277,10 +267,10 @@ public class RobotMove extends SendUDP {
 			System.out.println("Loop over 100");
 		    }
 		}
-	    } else if (this.angle[0] >= 100 || this.angle[1] >= 100 || this.angle[2] >= 100) {
+	    } else if (this.angle[0] >= 100 || this.angle[1] >= 100) {
 
 		int loopcnt = 0;
-		while (isDoneAng(0)) {
+		while (!(isDoneAng(0))) {
 		    hold.makeHold(2); // Hold off
 		    movePitch(-this.displacement[5]);
 		    // Set Pitch to 0 first
@@ -291,7 +281,7 @@ public class RobotMove extends SendUDP {
 		    }
 		}
 		loopcnt = 0;
-		while (isDoneAng(1)) {
+		while (!(isDoneAng(1))) {
 		    hold.makeHold(2); // Hold off
 		    moveYaw(this.angle[1] - this.displacement[6]);
 		    // Yaw set to assigned value
@@ -302,7 +292,7 @@ public class RobotMove extends SendUDP {
 		    }
 		}
 		loopcnt = 0;
-		while (isDoneAng(0)) {
+		while (!(isDoneAng(2))) {
 		    hold.makeHold(2); // Hold off
 		    movePitch(this.angle[0] - this.displacement[5]);
 		    // Pitch set to assigned value

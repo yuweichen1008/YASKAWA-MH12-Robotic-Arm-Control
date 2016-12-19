@@ -101,7 +101,7 @@ public abstract class SendUDP extends Thread {
 		return new int[] { 0 };
 	    } else {
 		Thread.sleep(200);
-		return byteToint32(response);
+		return byteToint32(swap(response));
 	    }
 	} catch (SocketTimeoutException e) {
 	    System.out.println("Cannot get response");
