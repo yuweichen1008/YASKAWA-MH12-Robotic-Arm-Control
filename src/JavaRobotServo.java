@@ -10,7 +10,7 @@ public class JavaRobotServo extends SendUDP {
     private static byte[] commandServoOFF = { 89, 69, 82, 67, 32, 0, 4, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57,
 	    57, 57, 57, -125, 0, 2, 0, 1, 16, 0, 0, 2, 0, 0, 0 };
 
-    public static Boolean makeServo(int index) {// 1: Servo ON / 2: Servo OFF
+    public Boolean makeServo(int index) {// 1: Servo ON / 2: Servo OFF
 	int[] response = null;
 	JavaRobotServo js = new JavaRobotServo();
 	try {
@@ -19,22 +19,30 @@ public class JavaRobotServo extends SendUDP {
 	    } else {// 2: Servo OFF
 		response = js.sendint(commandServoOFF);
 	    }
-	    if (response.length == 1) {
+	    if (response.length == 1 || response == null) {
 		System.out
-			.println("Robot Servo cannot get response, please check the connection or contact  Y.W. Chen");
+			.println("JavaRobotServo cannot get response, please check the connection or contact  Y.W. Chen");
 		return false;
 	    }
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-	if (response[6] == 144 && index == 1) {
+	if (response[6] == -1879048192 && index == 1 ) {
 	    status = true;
 	    System.out.println("Robot Servo ON successfully");
-	} else if (response[6] == 144 && index == 2) {
+	} else if (response[6] == -1879048192 && index == 2) {
 	    status = true;
 	    System.out.println("Robot Servo OFF successfully");
-	} else {
+	} else if ( response[6] == -1879048192){
+		status = true;
+		System.out.println("Servo already on specific status!");
+	} else if (response[6] == -1877016320){
 	    status = false;
+	    System.out.println("Robot Servo failed. Error Code : E4A3 -- Format error (processing category error)");
+	    System.out.println("Debug : try to change the port connecting to Robot.");
+	} else{
+		status = false;
+	    System.out.println("Robot Servo failed.");
 	}
 
 	return status;

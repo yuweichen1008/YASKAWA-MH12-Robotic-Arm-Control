@@ -10,9 +10,9 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 public class UDPNode {
-    String host = "192.168.11.2"; // Robot IPAddress
-    private int port = 10040; // Computer's Port
-    private int robotPort = 10041; // Robot's Port
+    String host = "192.168.2.250"; // Robot IPAddress
+    private int port = 10041; // Computer's Port
+    private int robotPort = 10040; // Robot's Port
     private int timeOut = 1000; // Default 1 second
     private byte[] robotCommand = new byte[] {}; // Sending
 						 // command
@@ -78,7 +78,7 @@ public class UDPNode {
 	    DatagramPacket request = new DatagramPacket(this.robotCommand, this.robotCommand.length, robotAddress,
 		    robotPort);
 	    socket.send(request);
-	    String command = new String(request.getData(), "UTF-8");
+	    // String command = new String(request.getData(), "UTF-8");
 	    // System.out.println("Send command : " + command);
 	    // System.out.println("Robot is listening :" + request.getAddress()
 	    // + " @" + request.getPort());

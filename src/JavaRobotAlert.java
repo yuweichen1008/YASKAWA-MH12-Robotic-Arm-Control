@@ -12,7 +12,7 @@ public class JavaRobotAlert extends SendUDP {
     private static byte[] commandAlertReset = { 89, 69, 82, 67, 32, 0, 4, 0, 3, 1, 0, 0, 0, 0, 0, 0, 57, 57, 57, 57, 57,
 	    57, 57, 57, -126, 0, 1, 0, 1, 16, 0, 0, 1, 0, 0, 0 };
 
-    public static String makeAlert(int index) {// 1 : ReadAlert / 2 : Reset  Alert
+    public String makeAlert(int index) {// 1 : ReadAlert / 2 : Reset  Alert
 	byte[] response = null;
 	JavaRobotAlert js = new JavaRobotAlert();
 	try {
@@ -28,7 +28,7 @@ public class JavaRobotAlert extends SendUDP {
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-	if (response[9] == 0) {
+	if (response[25] == 0) {//Status == 0
 	    alert = null;
 	} else {
 	    try {

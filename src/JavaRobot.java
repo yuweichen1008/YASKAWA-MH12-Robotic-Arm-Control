@@ -59,7 +59,7 @@ public class JavaRobot extends SendUDP {
 	    this.targetPosition.setY(0);
 	    this.targetPosition.setZ(0);
 	    this.targetAngle = new RobotAngle(anglespeedposition[0], anglespeedposition[1]);
-	    this.speed = anglespeedposition[3];
+	    this.speed = anglespeedposition[2];
 	} else if (anglespeedposition.length == 5) { 
 	    // Move X, Y, Z, yaw and  pitch
 	    this.targetPosition = new RobotPosition(anglespeedposition[0], anglespeedposition[1],
