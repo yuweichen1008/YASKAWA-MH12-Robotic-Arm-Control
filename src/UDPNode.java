@@ -1,3 +1,4 @@
+
 /*
  * Modified on Dec. 13, 2016 by Y.W. Chen
  * right reserved by RFVLSI NCTU
@@ -88,22 +89,24 @@ public class UDPNode {
 	    byte[] byteData = new byte[] {};
 	    while (count < 1) {
 		if (count == 0)
-		    //System.out.println("  Sending the command for the 1-th time.");
-		try {
+		    // System.out.println(" Sending the command for the 1-th
+		    // time.");
+		    try {
 		    socket.receive(response);
 		    if (response != null) {
-			this.flag = true;
-			//System.out.println("Received data successfully!");
-			break;
+		    this.flag = true;
+		    // System.out.println("Received data successfully!");
+		    break;
 		    }
-		} catch (SocketTimeoutException e) {
+		    } catch (SocketTimeoutException e) {
 		    socket.send(request); // resend
-		   // System.out.println( "Didn't get the response.\nResending the command for the " + (count + 2) + "-th time.");
+		    // System.out.println( "Didn't get the response.\nResending
+		    // the command for the " + (count + 2) + "-th time.");
 		    count++;
-		}
+		    }
 	    }
 	    if (!(flag)) {
-		//System.out.println("Robot doesn't response\n");
+		// System.out.println("Robot doesn't response\n");
 		socket.close();
 		byteData = new byte[] { 0, 0, 0, 0 };
 	    } else {

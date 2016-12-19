@@ -9,17 +9,17 @@
  */
 
 public class RobotReadPosition extends SendUDP {
-	private static int[] command = { 1497715267, 536870912, 50397184, 0, 960051513, 960051513, 1962960128, 65536 };
-	public int[] tool = new int[8];
+    private static int[] command = { 1497715267, 536870912, 50397184, 0, 960051513, 960051513, 1962960128, 65536 };
+    public int[] tool = new int[8];
 
-	// Constructor of RobotReadPosition
-	public RobotReadPosition() {
-		super(command);
-	}
+    // Constructor of RobotReadPosition
+    public RobotReadPosition() {
+	super(command);
+    }
 
-	public RobotReadPosition(int[] toolin) {
-		super(command);
-		this.tool = toolin;
+    public RobotReadPosition(int[] toolin) {
+	super(command);
+	this.tool = toolin;
     }
 
     // Read will send command and return tool form data
@@ -33,7 +33,7 @@ public class RobotReadPosition extends SendUDP {
 		return null;
 	    } else {
 		// System.out.println("respnse = " + response.toString());
-		//System.out.println("Return has length " + response.length);
+		// System.out.println("Return has length " + response.length);
 		if (response.length != 64) {
 		    return null;
 		}
@@ -58,20 +58,20 @@ public class RobotReadPosition extends SendUDP {
 			this.tool[7] = response[i]; // Zr
 		    }
 
-				}
-				// deal with response with SendUDP's public funuction to
-				// generate int32 information in tool, which contains
-				// [Tool_no,Form,X,Y,Z,Xr,Yr,Zr], please deal with this in int32
-				// form and i will modified the data in RobotMove and JavaRobot
-				// functions.
-				return this.tool;
-			}
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
 		}
+		// deal with response with SendUDP's public funuction to
+		// generate int32 information in tool, which contains
+		// [Tool_no,Form,X,Y,Z,Xr,Yr,Zr], please deal with this in int32
+		// form and i will modified the data in RobotMove and JavaRobot
+		// functions.
+		return this.tool;
+	    }
+	} catch (NullPointerException e) {
+	    e.printStackTrace();
+	    return null;
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    return null;
 	}
+    }
 }

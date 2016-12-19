@@ -20,28 +20,28 @@ public class JavaRobotServo extends SendUDP {
 		response = js.sendint(commandServoOFF);
 	    }
 	    if (response.length == 1 || response == null) {
-		System.out
-			.println("JavaRobotServo cannot get response, please check the connection or contact  Y.W. Chen");
+		System.out.println(
+			"JavaRobotServo cannot get response, please check the connection or contact  Y.W. Chen");
 		return false;
 	    }
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-	if (response[6] == -1879048192 && index == 1 ) {
+	if (response[6] == -1879048192 && index == 1) {
 	    status = true;
 	    System.out.println("Robot Servo ON successfully");
 	} else if (response[6] == -1879048192 && index == 2) {
 	    status = true;
 	    System.out.println("Robot Servo OFF successfully");
-	} else if ( response[6] == -1879048192){
-		status = true;
-		System.out.println("Servo already on specific status!");
-	} else if (response[6] == -1877016320){
+	} else if (response[6] == -1879048192) {
+	    status = true;
+	    System.out.println("Servo already on specific status!");
+	} else if (response[6] == -1877016320) {
 	    status = false;
 	    System.out.println("Robot Servo failed. Error Code : E4A3 -- Format error (processing category error)");
 	    System.out.println("Debug : try to change the port connecting to Robot.");
-	} else{
-		status = false;
+	} else {
+	    status = false;
 	    System.out.println("Robot Servo failed.");
 	}
 
