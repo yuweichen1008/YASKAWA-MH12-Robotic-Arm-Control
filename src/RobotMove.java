@@ -116,8 +116,8 @@ public class RobotMove extends SendUDP {
 	robotDisplacement();
 	this.speed = speedin;
 	this.speedbyte = InttoByteArraySingle(speed);
-	this.toolNumberbyte = swap(InttoByteArraySingle(toolNumber));
-	this.typeNumberbyte = swap(InttoByteArraySingle(typeNumber));
+	this.toolNumberbyte = InttoByteArraySingle(toolNumber);
+	this.typeNumberbyte = InttoByteArraySingle(typeNumber);
 	this.coordinatebyte = InttoByteArray(coordinate);
 	this.anglebyte = InttoByteArray(angle);
 	this.coorbyte = InttoByteArray(coor);
