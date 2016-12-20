@@ -502,11 +502,11 @@ public class RobotMove extends SendUDP {
 		returnbyte[i] = arraylist.get(i);
 	    }
 	}
-	//
+	/*
 	for(int i = 45; i < 77; i++){
 	    System.out.println("The Command in byte form " + i + " is :  " + returnbyte[i]);
 	}
-	
+	*/
 	// deBug ArrayList
 	return returnbyte;
     }

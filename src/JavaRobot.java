@@ -8,13 +8,16 @@ import java.io.IOException;
 public class JavaRobot extends SendUDP {
     private boolean botReady = false;
     private boolean initial = false;
+    private boolean moveTool = false;
     private RobotAngle targetAngle;
     private RobotPosition targetPosition;
     private RobotAngle currentAngle;
     private RobotPosition currentPosition;
     private int[] tool = new int[8];
     private int speed = 100; // default 100
-
+    private int rX = 0;
+    private int rY = 0;
+    private int rZ = 0;
     // Constructor with no value
     public JavaRobot() {
 	this.setInitial();
@@ -32,26 +35,32 @@ public class JavaRobot extends SendUDP {
 	    return;
 	}
 	this.setReady(false);
-	if (anglespeedposition.length == 0) { // Move to tool
+	if (anglespeedposition.length == 0) { 
+	    // Move to tool
+	    this.moveTool = true;
 	} else if (anglespeedposition.length == 1) { // Move to tool with speed
 	    this.speed = anglespeedposition[0];
+	    this.moveTool = true;
 	} else if (anglespeedposition.length == 2) { // Move yaw and pitch
 	    this.targetAngle = new RobotAngle(anglespeedposition[0], anglespeedposition[1]);
 	} else if (anglespeedposition.length == 3) {
 	    // Move yaw and pitch with speed
 	    this.targetAngle = new RobotAngle(anglespeedposition[0], anglespeedposition[1]);
 	    this.speed = anglespeedposition[2];
+	    this.moveTool = false;
 	} else if (anglespeedposition.length == 5) {
 	    // Move X, Y, Z, yaw and pitch
 	    this.targetPosition = new RobotPosition(anglespeedposition[0], anglespeedposition[1],
 		    anglespeedposition[2]);
 	    this.targetAngle = new RobotAngle(anglespeedposition[3], anglespeedposition[4]);
+	    this.moveTool = false;
 	} else if (anglespeedposition.length == 6) {
 	    // Move X, Y, Z, yaw and pitch with speed
 	    this.targetPosition = new RobotPosition(anglespeedposition[0], anglespeedposition[1],
 		    anglespeedposition[2]);
 	    this.targetAngle = new RobotAngle(anglespeedposition[3], anglespeedposition[4]);
 	    this.speed = anglespeedposition[5];
+	    this.moveTool = false;
 	} else {
 	    System.out.println("You didn't enter the right arguments.");
 	    return;
@@ -75,7 +84,7 @@ public class JavaRobot extends SendUDP {
 
 		} else if (this.targetPosition.getPosition()[0] == 0 && this.targetPosition.getPosition()[1] == 0
 			&& this.targetPosition.getPosition()[2] == 0 && this.targetAngle.getPhi() == 0
-			&& this.targetAngle.getTheta() == 0) {
+			&& this.targetAngle.getTheta() == 0 && this.moveTool == true) {
 		    RobotMove rm = new RobotMove(this.tool, this.speed);
 		    rm.move();
 
@@ -213,6 +222,9 @@ public class JavaRobot extends SendUDP {
 		    this.currentPosition.setX(displacement[2]);
 		    this.currentAngle.setPhi(displacement[3]);
 		    this.currentAngle.setTheta(displacement[4]);
+		    this.rX = toolnow[5];
+		    this.rY = toolnow[6];
+		    this.rZ = toolnow[7];
 		    System.out.println("Current X is : " + (this.currentPosition.getPosition()[0] / 1000)
 			    + " mm, Y is : " + (this.currentPosition.getPosition()[1] / 1000) + " mm, Z is : "
 			    + (this.currentPosition.getPosition()[2] / 1000) + " mm.");
@@ -237,8 +249,15 @@ public class JavaRobot extends SendUDP {
 	    return false;
 	}
 	// If not assigning any x, y and z displacement
-	if (targetPosition.getPosition()[0] == 0 && targetPosition.getPosition()[1] == 0
-		&& targetPosition.getPosition()[2] == 0) {
+	if(this.moveTool == true){
+	    return(Math.abs(currentPosition.getPosition()[0] - this.tool[2]) < 1000) // X
+		    && (Math.abs(currentPosition.getPosition()[1] - this.tool[3]) < 1000) // Y
+		    && (Math.abs(currentPosition.getPosition()[2] - this.tool[4]) < 1000) // Z
+		    && (Math.abs(this.rX - this.tool[5]) < 1000) // rX
+		    && (Math.abs(this.rY - this.tool[6]) < 1000) // rY
+		    && (Math.abs(this.rZ - this.tool[7]) < 1000);
+	}else if (targetPosition.getPosition()[0] == 0 && targetPosition.getPosition()[1] == 0
+		&& targetPosition.getPosition()[2] == 0 && this.moveTool == false) {
 	    return (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 100) // Pitch
 		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 100); // Yaw
 	} else {
