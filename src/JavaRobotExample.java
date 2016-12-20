@@ -15,8 +15,8 @@ public class JavaRobotExample {
 	 */
 	JavaRobot jr = new JavaRobot();
 	jr.ask();
-	//jr.moveTo(10, 10);
-	jr.moveTo(10,10);
+	jr.moveTo(10, 10);
+	//jr.moveTo(10,10);
     }
 
 }

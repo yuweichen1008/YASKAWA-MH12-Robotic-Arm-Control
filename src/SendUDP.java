@@ -21,10 +21,9 @@ public abstract class SendUDP extends Thread {
     public SendUDP(int[] IntCommand) {
 	byte[] byteComm = null;
 	try {
-	    byteComm = InttoByteArray(IntCommand);// Change Int32 form to byte
-	    // form
+	    byteComm = InttoByteArray(IntCommand);
+	    // Change Int32 form to byte form
 	} catch (Exception e) {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
 	this.command = byteComm;

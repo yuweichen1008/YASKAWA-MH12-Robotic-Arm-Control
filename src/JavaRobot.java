@@ -59,17 +59,17 @@ public class JavaRobot extends SendUDP {
 	int count = 0;
 	try {
 	    while (!(getReady())) {
-		setReady(robotReady());	//To tell whether to move
+		setReady(robotReady()); // To tell whether to move
 		if (this.targetPosition.getPosition()[0] != 0 && this.targetPosition.getPosition()[1] != 0
 			&& this.targetPosition.getPosition()[2] != 0) {
 		    RobotMove rm = new RobotMove(targetPosition.getPosition()[0], targetPosition.getPosition()[1],
 			    targetPosition.getPosition()[2], targetAngle.getPhi(), targetAngle.getTheta(), this.tool,
 			    this.speed);
 		    rm.move();
-		    
+
 		} else if (this.targetPosition.getPosition()[0] == 0 && this.targetPosition.getPosition()[1] == 0
-			&& this.targetPosition.getPosition()[2] == 0 &&( this.targetAngle.getPhi() != 0
-			|| this.targetAngle.getTheta() != 0)) {
+			&& this.targetPosition.getPosition()[2] == 0
+			&& (this.targetAngle.getPhi() != 0 || this.targetAngle.getTheta() != 0)) {
 		    RobotMove rm = new RobotMove(targetAngle.getPhi(), targetAngle.getTheta(), this.tool, this.speed);
 		    rm.move();
 
@@ -136,15 +136,20 @@ public class JavaRobot extends SendUDP {
     // Function for users to ask the current position
     public void ask() {
 	askCurrent();
-	if (this.currentPosition.getPosition()[0] <= 1000 && this.currentPosition.getPosition()[1] <= 1000
+	if (this.currentPosition.getPosition()[0] == 0 && this.currentPosition.getPosition()[1] == 0
+		&& this.currentPosition.getPosition()[2] == 0 && this.currentAngle.getPhi() == 0
+		&& this.currentAngle.getPhi() == 0) {
+	    System.out.println("You don't get the tool");
+	} else if (this.currentPosition.getPosition()[0] <= 1000 && this.currentPosition.getPosition()[1] <= 1000
 		&& this.currentPosition.getPosition()[2] <= 1000) {
-	    System.out.println("Current X is : " + this.currentPosition.getPosition()[0]/ 1000 + " mm, Y is : "
-		    + this.currentPosition.getPosition()[1]/ 1000 + " mm, Z is : " + this.currentPosition.getPosition()[2]/ 1000 + " mm.");
-	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi()/100 + " centidegrees and Yaw is : "
-		    + this.currentAngle.getTheta()/100 + " centidegrees.");
+	    System.out.println("Current X is : " + this.currentPosition.getPosition()[0] / 1000 + " mm, Y is : "
+		    + this.currentPosition.getPosition()[1] / 1000 + " mm, Z is : "
+		    + this.currentPosition.getPosition()[2] / 1000 + " mm.");
+	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi() / 100 + " centidegrees and Yaw is : "
+		    + this.currentAngle.getTheta() / 100 + " centidegrees.");
 	} else {
-	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi()/100 + " centidegrees and Yaw is : "
-		    + this.currentAngle.getTheta()/100 + " centidegrees.");
+	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi() / 100 + " centidegrees and Yaw is : "
+		    + this.currentAngle.getTheta() / 100 + " centidegrees.");
 	}
 
     }
@@ -161,56 +166,61 @@ public class JavaRobot extends SendUDP {
 	int tX;
 	int tY;
 	int tZ;
-	if (toolnow.length == 1 || toolnow == null) {
-	    // prevent the error code
-	    // prevent the error code
-	    System.out.println("No response");
+	if (toolnow == null || toolnow.length == 1) {
 	    return;
 	} else {
-	    try {
-		// Target - Current
-		displacement[0] = (toolnow[2] - this.tool[2]);// X displacement
-		displacement[1] = (toolnow[3] - this.tool[3]);// Y displacement
-		displacement[2] = (toolnow[4] - this.tool[4]);// Z displacement
-		// in 0.01 degree
-		tX = toolnow[2] / 100;
-		tY = toolnow[3] / 100;
-		tZ = toolnow[4] / 100;
-		
-		// Pitch value
-		if (Math.abs(tZ) <= Math.abs(tX))
-		    displacement[3] = -(9000 + tY);
-		else if (Math.abs(tZ) > Math.abs(tX))
-		    displacement[3] = (9000 + tY);
-		// Yaw value
-		if (tX >= 0 && tZ >= 0) {
-		    displacement[4] = (tX + tZ - 18000);
-		} else if (tX >= 0 && tZ < 0) {
-		    if (Math.abs(tZ) > Math.abs(tX))
-			displacement[4] = (tX + tZ + 18000);
-		    else
-			displacement[4] = (tX + tZ - 18000);
-		} else if (tX < 0 && tZ >= 0) {
-		    if (Math.abs(tX) > Math.abs(tZ))
-			displacement[4] = (tX + tZ + 18000);
-		    else
-			displacement[4] = (tX + tZ - 18000);
-		} else if (tX < 0 && tZ < 0) {
-		    displacement[4] = (tX + tZ + 18000);
 
+	    if (toolnow.length == 1 || toolnow == null) {
+		// prevent the error code
+		System.out.println("No response");
+		return;
+	    } else {
+		try {
+		    // Target - Current in 1 mm
+		    displacement[0] = (toolnow[2] - this.tool[2]);// X
+		    displacement[1] = (toolnow[3] - this.tool[3]);// Y
+		    displacement[2] = (toolnow[4] - this.tool[4]);// Z
+		    // in 0.01 degree
+		    tX = toolnow[2] / 100;
+		    tY = toolnow[3] / 100;
+		    tZ = toolnow[4] / 100;
+
+		    // Pitch value
+		    if (Math.abs(tZ) <= Math.abs(tX))
+			displacement[3] = -(9000 + tY);
+		    else if (Math.abs(tZ) > Math.abs(tX))
+			displacement[3] = (9000 + tY);
+		    // Yaw value
+		    if (tX >= 0 && tZ >= 0) {
+			displacement[4] = (tX + tZ - 18000);
+		    } else if (tX >= 0 && tZ < 0) {
+			if (Math.abs(tZ) > Math.abs(tX))
+			    displacement[4] = (tX + tZ + 18000);
+			else
+			    displacement[4] = (tX + tZ - 18000);
+		    } else if (tX < 0 && tZ >= 0) {
+			if (Math.abs(tX) > Math.abs(tZ))
+			    displacement[4] = (tX + tZ + 18000);
+			else
+			    displacement[4] = (tX + tZ - 18000);
+		    } else if (tX < 0 && tZ < 0) {
+			displacement[4] = (tX + tZ + 18000);
+
+		    }
+		    // Tz value
+		    this.currentPosition.setX(displacement[0]);
+		    this.currentPosition.setX(displacement[1]);
+		    this.currentPosition.setX(displacement[2]);
+		    this.currentAngle.setPhi(displacement[3]);
+		    this.currentAngle.setTheta(displacement[4]);
+		    System.out.println("Current X is : " + (this.currentPosition.getPosition()[0] / 1000)
+			    + " mm, Y is : " + (this.currentPosition.getPosition()[1] / 1000) + " mm, Z is : "
+			    + (this.currentPosition.getPosition()[2] / 1000) + " mm.");
+		    System.out.println("Pitch is : " + this.currentAngle.getPhi() / 100 + " centidegrees and Yaw is : "
+			    + this.currentAngle.getTheta() / 100 + " centidegrees.");
+		} catch (NullPointerException e) {
+		    throw new IllegalStateException("A response has a null property", e);
 		}
-		// Tz value
-		this.currentPosition.setX(displacement[0]);
-		this.currentPosition.setX(displacement[1]);
-		this.currentPosition.setX(displacement[2]);
-		this.currentAngle.setPhi(displacement[3]);
-		this.currentAngle.setTheta(displacement[4]);
-		System.out.println("Current X is : " + (this.currentPosition.getPosition()[0] / 1000) + " mm, Y is : "
-			+ (this.currentPosition.getPosition()[1] / 1000) + " mm, Z is : "
-			+ (this.currentPosition.getPosition()[2] / 1000) + " mm.");
-		System.out.println("Pitch is : " + this.currentAngle.getPhi()/100 + " centidegrees and Yaw is : " + this.currentAngle.getTheta()/100 + " centidegrees.");
-	    } catch (NullPointerException e) {
-		throw new IllegalStateException("A response has a null property", e);
 	    }
 	}
     }
