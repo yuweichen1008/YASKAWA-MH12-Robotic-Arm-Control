@@ -18,6 +18,7 @@ public class JavaRobot extends SendUDP {
     private int rX = 0;
     private int rY = 0;
     private int rZ = 0;
+
     // Constructor with no value
     public JavaRobot() {
 	this.setInitial();
@@ -35,7 +36,7 @@ public class JavaRobot extends SendUDP {
 	    return;
 	}
 	this.setReady(false);
-	if (anglespeedposition.length == 0) { 
+	if (anglespeedposition.length == 0) {
 	    // Move to tool
 	    this.moveTool = true;
 	} else if (anglespeedposition.length == 1) { // Move to tool with speed
@@ -170,7 +171,7 @@ public class JavaRobot extends SendUDP {
     }
 
     private void askCurrent() {
-	int[] displacement = new int[6];
+	int[] displacement = new int[8];
 	int[] toolnow = read();
 	int tX;
 	int tY;
@@ -186,42 +187,38 @@ public class JavaRobot extends SendUDP {
 	    } else {
 		try {
 		    // Target - Current in 1 mm
-		    displacement[0] = (toolnow[2] - this.tool[2]);// X
-		    displacement[1] = (toolnow[3] - this.tool[3]);// Y
-		    displacement[2] = (toolnow[4] - this.tool[4]);// Z
+		    displacement[2] = (toolnow[2] - this.tool[2]);// X
+		    displacement[3] = (toolnow[3] - this.tool[3]);// Y
+		    displacement[4] = (toolnow[4] - this.tool[4]);// Z
 		    // in 0.01 degree
-		    tX = toolnow[2] / 100;
-		    tY = toolnow[3] / 100;
-		    tZ = toolnow[4] / 100;
+		    tX = toolnow[5] / 100;
+		    tY = toolnow[6] / 100;
+		    tZ = toolnow[7] / 100;
 
 		    // Pitch value
 		    if (Math.abs(tZ) <= Math.abs(tX))
-			displacement[3] = -(9000 + tY);
+			displacement[5] = -(9000 + tY);
 		    else if (Math.abs(tZ) > Math.abs(tX))
-			displacement[3] = (9000 + tY);
+			displacement[5] = (9000 + tY);
 		    // Yaw value
 		    if (tX >= 0 && tZ >= 0) {
-			displacement[4] = (tX + tZ - 18000);
-		    } else if (tX >= 0 && tZ < 0) {
-			if (Math.abs(tZ) > Math.abs(tX))
-			    displacement[4] = (tX + tZ + 18000);
-			else
-			    displacement[4] = (tX + tZ - 18000);
-		    } else if (tX < 0 && tZ >= 0) {
-			if (Math.abs(tX) > Math.abs(tZ))
-			    displacement[4] = (tX + tZ + 18000);
-			else
-			    displacement[4] = (tX + tZ - 18000);
+			displacement[6] = (tX + tZ - 18000);
 		    } else if (tX < 0 && tZ < 0) {
-			displacement[4] = (tX + tZ + 18000);
-
+			displacement[6] = (tX + tZ + 18000);
+		    } else if (tX * tZ <= 0) {
+			int temp;
+			temp = tX + tZ;
+			if (temp < 0)
+			    displacement[6] = temp + 18000;
+			else
+			    displacement[6] = temp - 18000;
 		    }
 		    // Tz value
-		    this.currentPosition.setX(displacement[0]);
-		    this.currentPosition.setX(displacement[1]);
 		    this.currentPosition.setX(displacement[2]);
-		    this.currentAngle.setPhi(displacement[3]);
-		    this.currentAngle.setTheta(displacement[4]);
+		    this.currentPosition.setX(displacement[3]);
+		    this.currentPosition.setX(displacement[4]);
+		    this.currentAngle.setPhi(displacement[5]);
+		    this.currentAngle.setTheta(displacement[6]);
 		    this.rX = toolnow[5];
 		    this.rY = toolnow[6];
 		    this.rZ = toolnow[7];
@@ -249,23 +246,22 @@ public class JavaRobot extends SendUDP {
 	    return false;
 	}
 	// If not assigning any x, y and z displacement
-	if(this.moveTool == true){
-	    return(Math.abs(currentPosition.getPosition()[0] - this.tool[2]) < 1000) // X
-		    && (Math.abs(currentPosition.getPosition()[1] - this.tool[3]) < 1000) // Y
-		    && (Math.abs(currentPosition.getPosition()[2] - this.tool[4]) < 1000) // Z
-		    && (Math.abs(this.rX - this.tool[5]) < 1000) // rX
-		    && (Math.abs(this.rY - this.tool[6]) < 1000) // rY
+	if (this.moveTool == true) {
+	    return (Math.abs(currentPosition.getPosition()[0]) < 1000)
+		    && (Math.abs(currentPosition.getPosition()[1]) < 1000)
+		    && (Math.abs(currentPosition.getPosition()[2]) < 1000)
+		    && (Math.abs(this.rX - this.tool[5]) < 1000) && (Math.abs(this.rY - this.tool[6]) < 1000)
 		    && (Math.abs(this.rZ - this.tool[7]) < 1000);
-	}else if (targetPosition.getPosition()[0] == 0 && targetPosition.getPosition()[1] == 0
-		&& targetPosition.getPosition()[2] == 0 && this.moveTool == false) {
-	    return (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 100) // Pitch
+	} else if (targetPosition.getPosition()[0] == 0 && targetPosition.getPosition()[1] == 0
+		&& targetPosition.getPosition()[2] == 0) {
+	    return (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 100)
 		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 100); // Yaw
 	} else {
-	    return (Math.abs(currentPosition.getPosition()[0] - targetPosition.getPosition()[0]) < 1000) // X
-		    && (Math.abs(currentPosition.getPosition()[1] - targetPosition.getPosition()[1]) < 1000) // Y
-		    && (Math.abs(currentPosition.getPosition()[2] - targetPosition.getPosition()[2]) < 1000) // Z
-		    && (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 100) // Pitch
-		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 100); // Yaw
+	    return (Math.abs(currentPosition.getPosition()[0] - targetPosition.getPosition()[0]) < 1000)
+		    && (Math.abs(currentPosition.getPosition()[1] - targetPosition.getPosition()[1]) < 1000)
+		    && (Math.abs(currentPosition.getPosition()[2] - targetPosition.getPosition()[2]) < 1000)
+		    && (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 100)
+		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 100);
 	}
     }
 

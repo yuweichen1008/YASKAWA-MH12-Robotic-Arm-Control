@@ -10,16 +10,18 @@ public class RobotMove extends SendUDP {
 
     private boolean isPitch = false;
     private boolean moveTool = false;
-    private static final byte[] head = { 89, 69, 82, 67, 32, 00, 104, 00, 01, 01, 00, 00, 00, 00, 00, 00, 57, 57, 57,
+    private static final byte[] head = { 89, 69, 82, 67, 32, 00, 104, 00, 03, 01, 00, 00, 00, 00, 00, 00, 57, 57, 57,
 	    57, 57, 57, 57, 57 };// Header part
-    private static final byte[] suh = { -118, 00, 01, 00, 01, 02, 00, 00 };// Sub-header
-    private static final byte[] sub_tool = { -118, 00, 01, 00, 01, 02, 00, 00};
+    private static final byte[] suh = { -118, 00, 03, 00, 01, 02, 00, 00 };// Sub-header
+    private static final byte[] sub_tool = { -118, 00, 01, 00, 01, 02, 00, 00 };
     // part
     private byte[] newCommand = new byte[] {};
     private byte[] setting_rect = { 01, 00, 00, 00, 00, 00, 00, 00, 01, 00, 00, 00, 17, 00, 00, 00 };
-    // Setting of Robot -- Station -- Classification -- Operation Coordinate(Robot coordinate)
-    private byte[] setting_ang =  { 01, 00, 00, 00, 00, 00, 00, 00, 02, 00, 00, 00, 19, 00, 00, 00 };
-    // Setting of Robot -- Station -- Classification -- Operation Coordinate(Tool coordinate)
+    // Setting of Robot -- Station -- Classification -- Operation
+    // Coordinate(Robot coordinate)
+    private byte[] setting_ang = { 01, 00, 00, 00, 00, 00, 00, 00, 02, 00, 00, 00, 19, 00, 00, 00 };
+    // Setting of Robot -- Station -- Classification -- Operation
+    // Coordinate(Tool coordinate)
     private Integer speed = new Integer(0);// Speed = speed * 10 unit
     private byte[] Reserv = { 0, 0, 0, 0 };
     private Integer toolNumber = new Integer(0);
@@ -44,8 +46,8 @@ public class RobotMove extends SendUDP {
 	this.moveTool = false;
 	// Basic setting
 	this.tool = tool;
-	this.toolNumber = tool[0];
-	this.typeNumber = tool[1];
+	this.toolNumber = tool[1];
+	this.typeNumber = tool[0];
 	// Assigning difference of coordinate and angle
 	for (int i = 0; i < 3; i++) {
 	    switch (i) {
@@ -71,8 +73,8 @@ public class RobotMove extends SendUDP {
 	this.moveTool = false;
 	// Basic setting
 	this.tool = tool;
-	this.toolNumber = tool[0];
-	this.typeNumber = tool[1];
+	this.toolNumber = tool[1];
+	this.typeNumber = tool[0];
 	// Assigning difference of coordinate and angle
 	for (int i = 0; i < 3; i++) {
 	    switch (i) {
@@ -98,8 +100,8 @@ public class RobotMove extends SendUDP {
 	this.moveTool = true;
 	// Basic setting
 	this.tool = tool;
-	this.toolNumber = tool[0];
-	this.typeNumber = tool[1];
+	this.toolNumber = tool[1];
+	this.typeNumber = tool[0];
 	// Assigning difference of coordinate and angle
 	for (int i = 0; i < 3; i++) {
 	    this.coordinate[i] = 0;
@@ -114,8 +116,8 @@ public class RobotMove extends SendUDP {
 	robotDisplacement();
 	this.speed = speedin;
 	this.speedbyte = InttoByteArraySingle(speed);
-	this.toolNumberbyte = InttoByteArraySingle(toolNumber);
-	this.typeNumberbyte = InttoByteArraySingle(typeNumber);
+	this.toolNumberbyte = swap(InttoByteArraySingle(toolNumber));
+	this.typeNumberbyte = swap(InttoByteArraySingle(typeNumber));
 	this.coordinatebyte = InttoByteArray(coordinate);
 	this.anglebyte = InttoByteArray(angle);
 	this.coorbyte = InttoByteArray(coor);
@@ -140,36 +142,37 @@ public class RobotMove extends SendUDP {
     public int[] getTool() {
 	return this.tool;
     }
-    
+
     public boolean isDone() {
- 	robotDisplacement();
-	for (int i = 2; i < 5; i++) {
-	    if (Math.abs(this.displacement[0]) >= 1000 && Math.abs(this.displacement[1]) >= 1000
-		    && Math.abs(this.displacement[2]) >= 1000 && Math.abs(this.displacement[3]) >= 1000
-		    && Math.abs(this.displacement[4]) >= 1000 && Math.abs(this.displacement[7]) >= 1000) {
-		this.isDone = false;
-		break;
-  	    } else {
-  		this.isDone = true;
-  	    }
- 	}
- 	return this.isDone;
-      }
+	robotDisplacement();
+	if (Math.abs(this.displacement[0]) >= 1000 && Math.abs(this.displacement[1]) >= 1000
+		&& Math.abs(this.displacement[2]) >= 1000 && Math.abs(this.displacement[3]) >= 1000
+		&& Math.abs(this.displacement[4]) >= 1000 && Math.abs(this.displacement[7]) >= 1000) {
+	    this.isDone = false;
+
+	} else {
+	    this.isDone = true;
+
+	}
+	return this.isDone;
+    }
+
     private boolean isDoneRec() {
 	robotDisplacement();
 	if (this.displacement[2] == 9999 && this.displacement[3] == 9999 && this.displacement[4] == 9999) {
 	    return true; // True to stop the loop
 	} else {
-	    if (Math.abs(this.coordinate[0] - this.displacement[2]/1000) >= 1
-		    || Math.abs(this.coordinate[1] - this.displacement[3]/1000) >= 1
-		    || Math.abs(this.coordinate[2] - this.displacement[4]/1000) >= 1) {
+	    if (Math.abs(this.coordinate[0] - this.displacement[2] / 1000) >= 1
+		    || Math.abs(this.coordinate[1] - this.displacement[3] / 1000) >= 1
+		    || Math.abs(this.coordinate[2] - this.displacement[4] / 1000) >= 1) {
 		this.isDone = false;
 	    } else {
 		this.isDone = true;
 	    }
 	    System.out.printf("Remaining Displacement  X : %d mm  Y : %d mm Z : %d mm.",
-		    (this.coordinate[0] - this.displacement[2]/1000), (this.coordinate[1] - this.displacement[3]/1000),
-		    (this.coordinate[2] - this.displacement[4]/1000));
+		    (this.coordinate[0] - this.displacement[2] / 1000),
+		    (this.coordinate[1] - this.displacement[3] / 1000),
+		    (this.coordinate[2] - this.displacement[4] / 1000));
 	    return this.isDone;
 	}
     }
@@ -207,8 +210,9 @@ public class RobotMove extends SendUDP {
 		System.out.println("Error calling isDoneAng! index should be 1 or 2.");
 		return false;
 	    }
-	    System.out.println("Remaining Angular Pitch : " + Math.floor((this.angle[0] - this.displacement[5]/100))
-		    + " centidegrees Yaw : " + Math.floor((this.angle[1] - this.displacement[6]/100)) + " centidegrees.");
+	    System.out.println("Remaining Angular Pitch : " + Math.floor((this.angle[0] - this.displacement[5] / 100))
+		    + " centidegrees Yaw : " + Math.floor((this.angle[1] - this.displacement[6] / 100))
+		    + " centidegrees.");
 	    return this.isDone;
 	}
     }
@@ -224,39 +228,35 @@ public class RobotMove extends SendUDP {
 	    this.displacement[2] = (toolnow[2] - this.tool[2]);
 	    this.displacement[3] = (toolnow[3] - this.tool[3]);
 	    this.displacement[4] = (toolnow[4] - this.tool[4]);
-	    // Pitch value
 
-	    int tX = toolnow[2] / 100;
-	    int tY = toolnow[3] / 100;
-	    int tZ = toolnow[4] / 100;
+	    int tX = toolnow[5] / 100;
+	    int tY = toolnow[6] / 100;
+	    int tZ = toolnow[7] / 100;
 	    // Pitch value
 	    if (Math.abs(tZ) <= Math.abs(tX))
-		this.displacement[5] = -(9000 + tY);
+		displacement[5] = -(9000 + tY);
 	    else if (Math.abs(tZ) > Math.abs(tX))
-		this.displacement[5] = (9000 + tY);
+		displacement[5] = (9000 + tY);
 	    // Yaw value
 	    if (tX >= 0 && tZ >= 0) {
-		this.displacement[6] = (tX + tZ - 18000);
-	    } else if (tX >= 0 && tZ < 0) {
-		if (Math.abs(tZ) > Math.abs(tX))
-		    this.displacement[6] = (tX + tZ + 18000);
+		displacement[6] = (tX + tZ - 18000);
+	    } else if (tX < 0 && tZ < 0) {
+		displacement[6] = (tX + tZ + 18000);
+	    } else if (tX * tZ <= 0) {
+		int temp;
+		temp = tX + tZ;
+		if (temp < 0)
+		    displacement[6] = temp + 18000;
 		else
-		    this.displacement[6] = (tX + tZ - 18000);
-	    } else if (tX < 0 && tZ >= 0) {
-		if (Math.abs(tX) > Math.abs(tZ))
-		    this.displacement[6] = (tX + tZ + 18000);
-		else
-		    this.displacement[6] = (tX + tZ - 18000);
-	    }  else if (tX < 0 && tZ < 0) {
-		this.displacement[6] = (tX + tZ + 18000);
-		// Tz value
+		    displacement[6] = temp - 18000;
 	    }
 	    this.displacement[0] = (toolnow[5] - this.tool[5]);
 	    this.displacement[1] = (toolnow[6] - this.tool[6]);
 	    this.displacement[7] = (toolnow[7] - this.tool[7]);
-	    System.out.println("Displacement X : " + this.displacement[2] / 1000 + " mm, Y : " + this.displacement[3] /1000 + " Z : "
-		    + this.displacement[4] / 1000 + " mm, Pitch : " + this.displacement[5] / 100+ " centidegrees, Yaw : "
-		    + this.displacement[6] /100 + " centidegrees.");
+	    System.out.println(
+		    "Displacement X : " + this.displacement[2] / 1000 + " mm, Y : " + this.displacement[3] / 1000
+			    + " Z : " + this.displacement[4] / 1000 + " mm, Pitch : " + this.displacement[5] / 100
+			    + " centidegrees, Yaw : " + this.displacement[6] / 100 + " centidegrees.");
 	}
     }
 
@@ -277,21 +277,21 @@ public class RobotMove extends SendUDP {
 	    JavaRobotServo servo = new JavaRobotServo();
 	    servo.makeServo(1);
 	    JavaRobotHold hold = new JavaRobotHold();
-	     if(this.moveTool){
-		//Move to tool
-		 int loopcnt = 0;
-		 while (!(isDone())) {
-			    hold.makeHold(2); // Hold off
-			    moveTool();// Move to the position first
-			    Thread.sleep((long) (Math.abs((this.angle[0] - this.displacement[5]) / 100) / speed + 0.02));
-			    loopcnt++;
-			    if (loopcnt > 100) {
-				System.out.println("Loop over 100");
-				return;
-			    }
+	    if (this.moveTool) {
+		// Move to tool
+		int loopcnt = 0;
+		while (!(isDone())) {
+		    hold.makeHold(2); // Hold off
+		    moveTool();// Move to the position first
+		    Thread.sleep((long) (Math.abs((this.angle[0] - this.displacement[5]) / 100) / speed + 0.02));
+		    loopcnt++;
+		    if (loopcnt > 100) {
+			System.out.println("Loop over 100");
+			return;
+		    }
 		}
-		 
-	    }else if (this.coordinate[0] >= 100 || this.coordinate[1] >= 100 || this.coordinate[2] >= 100) {
+		System.out.println("Robot has been in the tool position successfully!");
+	    } else if (this.coordinate[0] >= 100 || this.coordinate[1] >= 100 || this.coordinate[2] >= 100) {
 		int loopcnt = 0;
 		while (!(isDoneRec())) {
 		    hold.makeHold(2); // Hold off
@@ -303,7 +303,14 @@ public class RobotMove extends SendUDP {
 			return;
 		    }
 		}
-	    } else if (this.angle[0] >= 10000 || this.angle[1] >= 10000) {// Assign angle is greater than 1 degree
+		System.out.println("Robot has moved to specific X,Y,Z!");
+	    } else if (this.angle[0] >= 10000 || this.angle[1] >= 10000) {// Assign
+									  // angle
+									  // is
+									  // greater
+									  // than
+									  // 1
+									  // degree
 
 		int loopcnt = 0;
 		while (!(isDoneAng(0))) {
@@ -341,7 +348,8 @@ public class RobotMove extends SendUDP {
 			return;
 		    }
 		}
-	    } else{
+		System.out.println("Robot has moved to specific Angles!");
+	    } else {
 		System.out.println("RobotMove.move() command not be set properly, please check.");
 		return;
 	    }
@@ -353,12 +361,12 @@ public class RobotMove extends SendUDP {
     private void moveTool() {
 	int[] anglemodified = new int[3];
 	int[] coordinatemodified = new int[3];
-	coordinatemodified[0] = this.tool[2];	//X
-	coordinatemodified[1] = this.tool[3];	//Y
-	coordinatemodified[2] = this.tool[4];	//Z
-	anglemodified[0] = this.tool[5];	//Rx
-	anglemodified[1] = this.tool[6];	//Ry
-	anglemodified[2] = this.tool[7];	//Rz
+	coordinatemodified[0] = this.tool[2]; // X
+	coordinatemodified[1] = this.tool[3]; // Y
+	coordinatemodified[2] = this.tool[4]; // Z
+	anglemodified[0] = this.tool[5]; // Rx
+	anglemodified[1] = this.tool[6]; // Ry
+	anglemodified[2] = this.tool[7]; // Rz
 	this.anglebyte = InttoByteArray(anglemodified);
 	this.coordinatebyte = InttoByteArray(coordinatemodified);
 	this.newCommand = generateCommand();
@@ -374,15 +382,15 @@ public class RobotMove extends SendUDP {
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-	
+
     }
 
     private void moveRect() {
 	int[] anglemodified = { 0, 0, 0 };
 	int[] coordinatemodified = new int[3];
-	coordinatemodified[0] = this.coordinate[0] - this.displacement[2];	//X
-	coordinatemodified[1] = this.coordinate[1] - this.displacement[3];	//Y
-	coordinatemodified[2] = this.coordinate[2] - this.displacement[4];	//Z
+	coordinatemodified[0] = this.coordinate[0] - this.displacement[2]; // X
+	coordinatemodified[1] = this.coordinate[1] - this.displacement[3]; // Y
+	coordinatemodified[2] = this.coordinate[2] - this.displacement[4]; // Z
 	this.anglebyte = InttoByteArray(anglemodified);
 	this.coordinatebyte = InttoByteArray(coordinatemodified);
 	this.newCommand = generateCommand();
@@ -404,8 +412,8 @@ public class RobotMove extends SendUDP {
 	this.isPitch = false; // Move Yaw
 	int[] coordinatemodified = { 0, 0, 0 };
 	int[] anglemodified = new int[3];
-	anglemodified[0] = 0;
-	anglemodified[1] = yaw;
+	anglemodified[0] = yaw;
+	anglemodified[1] = 0;
 	anglemodified[2] = 0;
 	this.anglebyte = InttoByteArray(anglemodified);
 	this.coordinatebyte = InttoByteArray(coordinatemodified);
@@ -428,8 +436,8 @@ public class RobotMove extends SendUDP {
 	this.isPitch = true; // Move pitch
 	int[] coordinatemodified = { 0, 0, 0 };
 	int[] anglemodified = new int[3];
-	anglemodified[0] = pitch;
-	anglemodified[1] = 0;
+	anglemodified[0] = 0;
+	anglemodified[1] = pitch;
 	anglemodified[2] = 0;
 	this.anglebyte = InttoByteArray(anglemodified);
 	this.coordinatebyte = InttoByteArray(coordinatemodified);
@@ -460,25 +468,25 @@ public class RobotMove extends SendUDP {
 	// ToolNo, Coordinate, Extension];
 	for (byte i : head)
 	    arraylist.add(i);
-	if (argument.length == 0) {
+	if (argument.length == 0 && !(this.moveTool)) {
 	    for (byte i : suh)
 		arraylist.add(i);
 	    for (byte i : setting_rect)
 		arraylist.add(i);
 	} else if (argument.length == 1) {
-	    this.isPitch = argument[0];// Not useful for now
+	    // this.isPitch = argument[0];// Not useful for now
 	    for (byte i : suh)
 		arraylist.add(i);
 	    for (byte i : setting_ang)
 		arraylist.add(i);
-	} else if (this.moveTool) {
+	} else if (argument.length == 0 && this.moveTool) {
 	    for (byte i : sub_tool)
 		arraylist.add(i);
 	    for (byte i : setting_rect)
 		arraylist.add(i);
 	}
 	for (int i = 0; i < speedbyte.length; i++)
-	    arraylist.add((42 + i), speedbyte[i]);
+	    arraylist.add((41 + i), speedbyte[i]);
 	for (byte i : coordinatebyte)
 	    arraylist.add(i);
 	for (byte i : anglebyte)
@@ -503,10 +511,10 @@ public class RobotMove extends SendUDP {
 	    }
 	}
 	/*
-	for(int i = 45; i < 77; i++){
-	    System.out.println("The Command in byte form " + i + " is :  " + returnbyte[i]);
-	}
-	*/
+	 * for(int i = 45; i < 77; i++){
+	 * System.out.println("The Command in byte form " + i + " is :  " +
+	 * returnbyte[i]); }
+	 */
 	// deBug ArrayList
 	return returnbyte;
     }
