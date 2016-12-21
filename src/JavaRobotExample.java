@@ -15,6 +15,13 @@ public class JavaRobotExample {
 	 */
     	// Read Alert
 	JavaRobot jr = new JavaRobot();
-	jr.moveTo(10,0,0, 0,0);
+	
+	// moveTo function 
+    // length == 0 : move to tool position
+    // length == 2 : yaw /pitch 
+    // length == 3 : yaw /pitch /speed 
+    // length == 5 : X   /Y    /Z     /yaw  /pitch 
+    // length == 6 : X   /Y    /Z     /yaw  /pitch  /speed
+	jr.moveTo(100,0,0, 0,0);
     }
 }

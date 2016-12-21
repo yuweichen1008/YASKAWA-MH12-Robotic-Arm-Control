@@ -51,7 +51,7 @@ public class JavaRobot extends SendUDP {
 	} else if (anglespeedposition.length == 5) {
 	    // Move X, Y, Z, yaw and pitch
 	    this.targetPosition = new RobotPosition(anglespeedposition[0], anglespeedposition[1],
-		    anglespeedposition[2]*1000);
+		    anglespeedposition[2]);
 	    this.targetAngle = new RobotAngle(anglespeedposition[3], anglespeedposition[4]);
 	    this.moveTool = false;
 	} else if (anglespeedposition.length == 6) {
@@ -246,21 +246,22 @@ public class JavaRobot extends SendUDP {
 	}
 	// If not assigning any x, y and z displacement
 	if (this.moveTool == true) {
-	    return (Math.abs(currentPosition.getPosition()[0]) < 1000)
-		    && (Math.abs(currentPosition.getPosition()[1]) < 1000)
-		    && (Math.abs(currentPosition.getPosition()[2]) < 1000)
-		    && (Math.abs(this.rX - this.tool[5]) < 1000) && (Math.abs(this.rY - this.tool[6]) < 1000)
-		    && (Math.abs(this.rZ - this.tool[7]) < 1000);
+	    return (Math.abs(currentPosition.getPosition()[0]) <= 10)	// 10 mm
+		    && (Math.abs(currentPosition.getPosition()[1]) <= 10)	// 10 mm
+		    && (Math.abs(currentPosition.getPosition()[2]) <= 10)	// 10 mm
+		    && (Math.abs(this.rX - this.tool[5]) <= 10) 	// 0.1 degree
+		    && (Math.abs(this.rY - this.tool[6]) <= 10)		// 0.1 degree
+		    && (Math.abs(this.rZ - this.tool[7]) <= 10);	// 0.1 degree
 	} else if (targetPosition.getPosition()[0] == 0 && targetPosition.getPosition()[1] == 0
 		&& targetPosition.getPosition()[2] == 0) {
-	    return (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 100)
-		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 100); // Yaw
+	    return (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 10)		// 0.1 degree
+		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 10); 	// 0.1 degree
 	} else {
-	    return (Math.abs(currentPosition.getPosition()[0] - targetPosition.getPosition()[0]) < 1000)
-		    && (Math.abs(currentPosition.getPosition()[1] - targetPosition.getPosition()[1]) < 1000)
-		    && (Math.abs(currentPosition.getPosition()[2] - targetPosition.getPosition()[2]) < 1000)
-		    && (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 100)
-		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 100);
+	    return (Math.abs(currentPosition.getPosition()[0] - targetPosition.getPosition()[0]) <= 10)	// 10 mm
+		    && (Math.abs(currentPosition.getPosition()[1] - targetPosition.getPosition()[1]) <= 10)	// 10 mm
+		    && (Math.abs(currentPosition.getPosition()[2] - targetPosition.getPosition()[2]) <= 10)	// 10 mm
+		    && (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) <= 10)		// 0.1 degree
+		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) <= 10);	// 0.1 degree
 	}
     }
 
