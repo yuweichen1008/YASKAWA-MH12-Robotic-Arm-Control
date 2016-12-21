@@ -13,8 +13,8 @@ public class JavaRobotExample {
 	 * JavaRobotHold ha = new JavaRobotHold(); ha.makeHold(2);JavaRobot jr =
 	 * new JavaRobot(); jr.read(); jr.moveTo(10,10,10); jr.ask();
 	 */
+    	// Read Alert
 	JavaRobot jr = new JavaRobot();
-	jr.moveTo(10,0);
+	jr.moveTo(10,0,0, 0,0);
     }
-
 }

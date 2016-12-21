@@ -25,11 +25,13 @@ public class JavaRobot extends SendUDP {
 	this.setReady(true); // Ready to send command
     }
 
-    /*
-     * Move to function length == 0 : (move to tool) length == 1 : speed(move to
-     * tool) length == 2 : yaw/pitch length == 3 : yaw/pitch/speed length == 5 :
-     * X/Y/Z/yaw/pitch length == 6 : X/Y/Z/yaw/pitch/speed
-     */
+    // Move to function 
+    // length == 0 : move to tool position
+    // length == 2 : yaw /pitch 
+    // length == 3 : yaw /pitch /speed 
+    // length == 5 : X   /Y    /Z     /yaw  /pitch 
+    // length == 6 : X   /Y    /Z     /yaw  /pitch  /speed
+    
     public void moveTo(int... anglespeedposition) {
 	if (!(this.initial)) {
 	    System.out.println("Please initialize the JavaRobot first");
@@ -38,9 +40,6 @@ public class JavaRobot extends SendUDP {
 	this.setReady(false);
 	if (anglespeedposition.length == 0) {
 	    // Move to tool
-	    this.moveTool = true;
-	} else if (anglespeedposition.length == 1) { // Move to tool with speed
-	    this.speed = anglespeedposition[0];
 	    this.moveTool = true;
 	} else if (anglespeedposition.length == 2) { // Move yaw and pitch
 	    this.targetAngle = new RobotAngle(anglespeedposition[0], anglespeedposition[1]);
@@ -52,7 +51,7 @@ public class JavaRobot extends SendUDP {
 	} else if (anglespeedposition.length == 5) {
 	    // Move X, Y, Z, yaw and pitch
 	    this.targetPosition = new RobotPosition(anglespeedposition[0], anglespeedposition[1],
-		    anglespeedposition[2]);
+		    anglespeedposition[2]*1000);
 	    this.targetAngle = new RobotAngle(anglespeedposition[3], anglespeedposition[4]);
 	    this.moveTool = false;
 	} else if (anglespeedposition.length == 6) {
@@ -66,26 +65,26 @@ public class JavaRobot extends SendUDP {
 	    System.out.println("You didn't enter the right arguments.");
 	    return;
 	}
+	if(this.speed == 0){
+		System.out.println("You cannot set speed to 0, the speed is restore to default value of 100.");
+		this.speed = 100;
+	}
 	int count = 0;
 	try {
 	    while (!(getReady())) {
-		setReady(robotReady()); // To tell whether to move
-		if (this.targetPosition.getPosition()[0] != 0 && this.targetPosition.getPosition()[1] != 0
-			&& this.targetPosition.getPosition()[2] != 0) {
+		setReady(robotReady());
+		if (this.targetPosition.getPosition()[0] != 0 || this.targetPosition.getPosition()[1] != 0 || this.targetPosition.getPosition()[2] != 0) {
 		    RobotMove rm = new RobotMove(targetPosition.getPosition()[0], targetPosition.getPosition()[1],
 			    targetPosition.getPosition()[2], targetAngle.getPhi(), targetAngle.getTheta(), this.tool,
 			    this.speed);
 		    rm.move();
 
 		} else if (this.targetPosition.getPosition()[0] == 0 && this.targetPosition.getPosition()[1] == 0
-			&& this.targetPosition.getPosition()[2] == 0
-			&& (this.targetAngle.getPhi() != 0 || this.targetAngle.getTheta() != 0)) {
+			&& this.targetPosition.getPosition()[2] == 0 && (this.targetAngle.getPhi() != 0 || this.targetAngle.getTheta() != 0)) {
 		    RobotMove rm = new RobotMove(targetAngle.getPhi(), targetAngle.getTheta(), this.tool, this.speed);
 		    rm.move();
 
-		} else if (this.targetPosition.getPosition()[0] == 0 && this.targetPosition.getPosition()[1] == 0
-			&& this.targetPosition.getPosition()[2] == 0 && this.targetAngle.getPhi() == 0
-			&& this.targetAngle.getTheta() == 0 && this.moveTool == true) {
+		} else if (this.moveTool == true) {
 		    RobotMove rm = new RobotMove(this.tool, this.speed);
 		    rm.move();
 
@@ -146,20 +145,19 @@ public class JavaRobot extends SendUDP {
     // Function for users to ask the current position
     public void ask() {
 	askCurrent();
-	if (this.currentPosition.getPosition()[0] == 0 && this.currentPosition.getPosition()[1] == 0
-		&& this.currentPosition.getPosition()[2] == 0 && this.currentAngle.getPhi() == 0
-		&& this.currentAngle.getPhi() == 0) {
+	if (this.currentPosition.getPosition()[0] == 9999 && this.currentPosition.getPosition()[1] == 9999
+		&& this.currentPosition.getPosition()[2] == 9999) {
 	    System.out.println("You don't get the tool");
-	} else if (this.currentPosition.getPosition()[0] <= 1000 && this.currentPosition.getPosition()[1] <= 1000
-		&& this.currentPosition.getPosition()[2] <= 1000) {
-	    System.out.println("Current X is : " + this.currentPosition.getPosition()[0] / 1000 + " mm, Y is : "
-		    + this.currentPosition.getPosition()[1] / 1000 + " mm, Z is : "
-		    + this.currentPosition.getPosition()[2] / 1000 + " mm.");
-	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi() / 100 + " centidegrees and Yaw is : "
-		    + this.currentAngle.getTheta() / 100 + " centidegrees.");
+	} else if (this.currentPosition.getPosition()[0] >= 1 && this.currentPosition.getPosition()[1] >= 1
+		&& this.currentPosition.getPosition()[2] >= 1) {
+	    System.out.println("Current X is : " + this.currentPosition.getPosition()[0]+ " mm, Y is : "
+		    + this.currentPosition.getPosition()[1]+ " mm, Z is : "
+		    + this.currentPosition.getPosition()[2] + " mm.");
+	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi()+ " centidegrees and Yaw is : "
+		    + this.currentAngle.getTheta()+ " centidegrees.");
 	} else {
-	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi() / 100 + " centidegrees and Yaw is : "
-		    + this.currentAngle.getTheta() / 100 + " centidegrees.");
+	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi()+ " centidegrees and Yaw is : "
+		    + this.currentAngle.getTheta() + " centidegrees.");
 	}
 
     }
@@ -177,19 +175,18 @@ public class JavaRobot extends SendUDP {
 	int tY;
 	int tZ;
 	if (toolnow == null || toolnow.length == 1) {
+		System.out.println("No response");
+		this.currentPosition.setX(9999);
+	    this.currentPosition.setX(9999);
+	    this.currentPosition.setX(9999);
 	    return;
 	} else {
 
-	    if (toolnow.length == 1 || toolnow == null) {
-		// prevent the error code
-		System.out.println("No response");
-		return;
-	    } else {
 		try {
 		    // Target - Current in 1 mm
-		    displacement[2] = (toolnow[2] - this.tool[2]);// X
-		    displacement[3] = (toolnow[3] - this.tool[3]);// Y
-		    displacement[4] = (toolnow[4] - this.tool[4]);// Z
+		    displacement[2] = (toolnow[2] - this.tool[2])/1000;// X
+		    displacement[3] = (toolnow[3] - this.tool[3])/1000;// Y
+		    displacement[4] = (toolnow[4] - this.tool[4])/1000;// Z
 		    // in 0.01 degree
 		    tX = toolnow[5] / 100;
 		    tY = toolnow[6] / 100;
@@ -222,15 +219,17 @@ public class JavaRobot extends SendUDP {
 		    this.rX = toolnow[5];
 		    this.rY = toolnow[6];
 		    this.rZ = toolnow[7];
+		    /*
 		    System.out.println("Current X is : " + (this.currentPosition.getPosition()[0] / 1000)
 			    + " mm, Y is : " + (this.currentPosition.getPosition()[1] / 1000) + " mm, Z is : "
 			    + (this.currentPosition.getPosition()[2] / 1000) + " mm.");
 		    System.out.println("Pitch is : " + this.currentAngle.getPhi() / 100 + " centidegrees and Yaw is : "
 			    + this.currentAngle.getTheta() / 100 + " centidegrees.");
+			*/
 		} catch (NullPointerException e) {
 		    throw new IllegalStateException("A response has a null property", e);
 		}
-	    }
+	    
 	}
     }
 

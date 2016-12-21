@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
 
 public class UDPNode {
     String host = "192.168.2.250"; // Robot IPAddress
-    private int port = 10041; // Computer's Port
+    private int port = 57600; // Computer's Port
     private int robotPort = 10040; // Robot's Port
     private int timeOut = 1000; // Default 1 second
     private byte[] robotCommand = new byte[] {}; // Sending
