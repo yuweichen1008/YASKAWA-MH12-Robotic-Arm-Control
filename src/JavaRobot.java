@@ -9,10 +9,10 @@ public class JavaRobot extends SendUDP {
     private boolean botReady = false;
     private boolean initial = false;
     private boolean moveTool = false;
-    private RobotAngle targetAngle;
-    private RobotPosition targetPosition;
-    private RobotAngle currentAngle;
-    private RobotPosition currentPosition;
+    private RobotAngle targetAngle = new RobotAngle();
+    private RobotPosition targetPosition = new RobotPosition();
+    private RobotAngle currentAngle = new RobotAngle();
+    private RobotPosition currentPosition = new RobotPosition();
     private int[] tool = new int[8];
     private int speed = 100; // default 100
     private int rX = 0;
@@ -73,14 +73,14 @@ public class JavaRobot extends SendUDP {
 	try {
 	    while (!(getReady())) {
 		setReady(robotReady());
-		if (this.targetPosition.getPosition()[0] != 0 || this.targetPosition.getPosition()[1] != 0 || this.targetPosition.getPosition()[2] != 0) {
-		    RobotMove rm = new RobotMove(targetPosition.getPosition()[0], targetPosition.getPosition()[1],
-			    targetPosition.getPosition()[2], targetAngle.getPhi(), targetAngle.getTheta(), this.tool,
+		if (this.targetPosition.x != 0 || this.targetPosition.y != 0 || this.targetPosition.z != 0) {
+		    RobotMove rm = new RobotMove(targetPosition.x, targetPosition.y,
+			    targetPosition.z, targetAngle.getPhi(), targetAngle.getTheta(), this.tool,
 			    this.speed);
 		    rm.move();
 
-		} else if (this.targetPosition.getPosition()[0] == 0 && this.targetPosition.getPosition()[1] == 0
-			&& this.targetPosition.getPosition()[2] == 0 && (this.targetAngle.getPhi() != 0 || this.targetAngle.getTheta() != 0)) {
+		} else if (this.targetPosition.x == 0 && this.targetPosition.y == 0
+			&& this.targetPosition.z == 0 && (this.targetAngle.getPhi() != 0 || this.targetAngle.getTheta() != 0)) {
 		    RobotMove rm = new RobotMove(targetAngle.getPhi(), targetAngle.getTheta(), this.tool, this.speed);
 		    rm.move();
 
@@ -119,10 +119,7 @@ public class JavaRobot extends SendUDP {
 
     // initialize JavaRobot with reading the tool(original position) first.
     private void setInitial() {
-	this.targetPosition = new RobotPosition();
-	this.currentPosition = new RobotPosition();
-	this.targetAngle = new RobotAngle();
-	this.currentAngle = new RobotAngle();
+
 	this.tool = read();
 	if (this.tool == null) {
 	    System.out.println("Didn't get the tool.");
@@ -145,14 +142,14 @@ public class JavaRobot extends SendUDP {
     // Function for users to ask the current position
     public void ask() {
 	askCurrent();
-	if (this.currentPosition.getPosition()[0] == 9999 && this.currentPosition.getPosition()[1] == 9999
-		&& this.currentPosition.getPosition()[2] == 9999) {
+	if (this.currentPosition.x == 9999 && this.currentPosition.y == 9999
+		&& this.currentPosition.z == 9999) {
 	    System.out.println("You don't get the tool");
-	} else if (this.currentPosition.getPosition()[0] >= 1 && this.currentPosition.getPosition()[1] >= 1
-		&& this.currentPosition.getPosition()[2] >= 1) {
-	    System.out.println("Current X is : " + this.currentPosition.getPosition()[0]+ " mm, Y is : "
-		    + this.currentPosition.getPosition()[1]+ " mm, Z is : "
-		    + this.currentPosition.getPosition()[2] + " mm.");
+	} else if (this.currentPosition.x >= 1 && this.currentPosition.y >= 1
+		&& this.currentPosition.z >= 1) {
+	    System.out.println("Current X is : " + this.currentPosition.x+ " mm, Y is : "
+		    + this.currentPosition.y+ " mm, Z is : "
+		    + this.currentPosition.z + " mm.");
 	    System.out.println("Current Pitch is : " + this.currentAngle.getPhi()+ " centidegrees and Yaw is : "
 		    + this.currentAngle.getTheta()+ " centidegrees.");
 	} else {
@@ -212,8 +209,8 @@ public class JavaRobot extends SendUDP {
 		    }
 		    // Tz value
 		    this.currentPosition.setX(displacement[2]);
-		    this.currentPosition.setX(displacement[3]);
-		    this.currentPosition.setX(displacement[4]);
+		    this.currentPosition.setY(displacement[3]);
+		    this.currentPosition.setZ(displacement[4]);
 		    this.currentAngle.setPhi(displacement[5]);
 		    this.currentAngle.setTheta(displacement[6]);
 		    this.rX = toolnow[5];
@@ -246,22 +243,26 @@ public class JavaRobot extends SendUDP {
 	}
 	// If not assigning any x, y and z displacement
 	if (this.moveTool == true) {
-	    return (Math.abs(currentPosition.getPosition()[0]) <= 10)	// 10 mm
-		    && (Math.abs(currentPosition.getPosition()[1]) <= 10)	// 10 mm
-		    && (Math.abs(currentPosition.getPosition()[2]) <= 10)	// 10 mm
+	    return (Math.abs(this.currentPosition.x) <= 10)		// 10 mm
+		    && (Math.abs(this.currentPosition.y) <= 10)		// 10 mm
+		    && (Math.abs(this.currentPosition.z) <= 10)		// 10 mm
 		    && (Math.abs(this.rX - this.tool[5]) <= 10) 	// 0.1 degree
 		    && (Math.abs(this.rY - this.tool[6]) <= 10)		// 0.1 degree
 		    && (Math.abs(this.rZ - this.tool[7]) <= 10);	// 0.1 degree
-	} else if (targetPosition.getPosition()[0] == 0 && targetPosition.getPosition()[1] == 0
-		&& targetPosition.getPosition()[2] == 0) {
-	    return (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) < 10)		// 0.1 degree
-		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) < 10); 	// 0.1 degree
+	} else if (this.currentPosition.x == 9999 && this.currentPosition.y == 9999
+		&& this.currentPosition.z == 9999) {
+	    System.out.println("You don't get the tool");
+	    return true;	//True to stop the while loop
+	}else if (targetPosition.x == 0 && targetPosition.y == 0
+		&& targetPosition.z == 0) {
+	    return (Math.abs(this.currentAngle.getPhi() - this.targetAngle.getPhi()) < 10)			// 0.1 degree
+		    && (Math.abs(this.currentAngle.getTheta() - this.targetAngle.getTheta()) < 10); 	// 0.1 degree
 	} else {
-	    return (Math.abs(currentPosition.getPosition()[0] - targetPosition.getPosition()[0]) <= 10)	// 10 mm
-		    && (Math.abs(currentPosition.getPosition()[1] - targetPosition.getPosition()[1]) <= 10)	// 10 mm
-		    && (Math.abs(currentPosition.getPosition()[2] - targetPosition.getPosition()[2]) <= 10)	// 10 mm
-		    && (Math.abs(currentAngle.getPhi() - targetAngle.getPhi()) <= 10)		// 0.1 degree
-		    && (Math.abs(currentAngle.getTheta() - targetAngle.getTheta()) <= 10);	// 0.1 degree
+	    return (Math.abs(this.currentPosition.x - this.targetPosition.x) <= 10)					// 10 mm
+		    && (Math.abs(this.currentPosition.y - this.targetPosition.y) <= 10)					// 10 mm
+		    && (Math.abs(this.currentPosition.z - this.targetPosition.z) <= 10)					// 10 mm
+		    && (Math.abs(this.currentAngle.getPhi() - this.targetAngle.getPhi()) <= 10)			// 0.1 degree
+		    && (Math.abs(this.currentAngle.getTheta() - this.targetAngle.getTheta()) <= 10);	// 0.1 degree
 	}
     }
 
@@ -310,40 +311,40 @@ public class JavaRobot extends SendUDP {
 
     // Inner class of Robot Position contains X, Y and Z
     public class RobotPosition {
-	private int X;
-	private int Y;
-	private int Z;
-	private int[] robotposi = new int[3];
+	private int x;
+	private int y;
+	private int z;
+	private int[] robotposi = {0,0,0};
 
 	public RobotPosition(int X, int Y, int Z) {
-	    this.X = X;
-	    this.Y = Y;
-	    this.Z = Z;
+	    this.x = X;
+	    this.y = Y;
+	    this.z = Z;
 	}
 
 	public RobotPosition() {
-	    this.X = 0;
-	    this.Y = 0;
-	    this.Z = 0;
+	    this.x = 0;
+	    this.y = 0;
+	    this.z = 0;
 	}
 
 	// basic void to set and get position
 	public void setX(int position) {
-	    this.X = position;
+	    this.x = position;
+	    this.robotposi[0] = x;
 	}
 
 	public void setY(int position) {
-	    this.Y = position;
+	    this.y = position;
+	    this.robotposi[1] = y;
 	}
 
 	public void setZ(int position) {
-	    this.Z = position;
+	    this.z = position;
+	    this.robotposi[2] = z;
 	}
 
 	public int[] getPosition() {
-	    this.robotposi[0] = X;
-	    this.robotposi[1] = Y;
-	    this.robotposi[2] = Z;
 	    return this.robotposi;
 	}
     }

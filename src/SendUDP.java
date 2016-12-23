@@ -154,7 +154,20 @@ public abstract class SendUDP extends Thread {
 	    return null;
 	}
     }
+    public byte[] InttoByteArrayMove(int[] inputIntArray) {
+	byte[] transfered = new byte[(inputIntArray.length * 4)];
+	ByteBuffer byteBuffer = ByteBuffer.allocate(inputIntArray.length * 4);
+	IntBuffer intBuffer = byteBuffer.asIntBuffer();
+	intBuffer.put(inputIntArray);
+	transfered = byteBuffer.array();
 
+	if (byteBuffer.hasArray()) {
+	    return swap(transfered);
+	} else {
+	    return null;
+	}
+
+    }
     public byte[] swap(byte[] ibytes) {
 	byte[] obytes = new byte[ibytes.length];
 	for (int i = 0; i < ibytes.length; i++) {

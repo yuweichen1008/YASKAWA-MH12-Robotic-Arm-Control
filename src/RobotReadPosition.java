@@ -34,7 +34,8 @@ public class RobotReadPosition extends SendUDP {
 	    } else {
 		// System.out.println("respnse = " + response.toString());
 		// System.out.println("Return has length " + response.length);
-		if (response.length != 64) {
+		if (response.length != 64 || response[6] == 73600) {
+			System.out.println("Format Error");
 		    return null;
 		}
 		for (int i = 8; i < 19; i++) {
