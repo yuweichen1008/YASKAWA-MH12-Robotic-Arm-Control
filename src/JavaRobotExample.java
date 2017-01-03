@@ -23,7 +23,7 @@ public class JavaRobotExample {
     // length == 5 : X   /Y    /Z     /yaw  /pitch 
     // length == 6 : X   /Y    /Z     /yaw  /pitch  /speed
 	//jr.moveTo(100,0,0, 0,0);
-	//jr.ask();
-	jr.moveTo(-500,-1000,200);
+	jr.ask();
+	//jr.moveTo(-500,-1000,200);
     }
 }
