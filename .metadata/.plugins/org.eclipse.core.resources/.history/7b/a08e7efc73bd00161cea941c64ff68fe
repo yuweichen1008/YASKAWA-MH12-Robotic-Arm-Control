@@ -1,0 +1,10 @@
+
+public interface RobotAngle {
+	int theta =0;
+	int phi =0 ;
+
+	public int getTheta();
+
+	public int getPhi();
+
+}

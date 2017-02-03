@@ -1,0 +1,24 @@
+
+public interface RobotAngle {
+	int theta;
+	int phi;
+	
+
+	// basic void function set and get angle
+	public static void setTheta(int angle) {
+		theta = angle;
+	}
+
+	public static void setPhi(int angle) {
+		phi = angle;
+	}
+
+	public static int getTheta() {
+		return theta;
+	}
+
+	public static int getPhi() {
+		return this.phi;
+	}
+
+}

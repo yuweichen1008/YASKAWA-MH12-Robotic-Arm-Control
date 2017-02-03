@@ -1,0 +1,132 @@
+import JavaRobot.RobotAngle;
+import JavaRobot.RobotPosition;
+
+public class Tool {
+	// Inner class of Tool store information
+		class Tool {
+			private int toolnumber;
+			private int formnumber;
+			private int tZ;
+			private RobotPosition rectAngular;
+			private RobotAngle angular;
+			public Tool(int[] toolin) {
+				this.toolnumber = toolin[0];
+				this.formnumber = toolin[1];
+				rectAngular = new RobotPosition(toolin[2], toolin[3], toolin[4]);
+				angular = new RobotAngle( toolin[5], toolin[6]);
+				
+				this.tZ = toolin[7];
+			}
+			public Tool(){
+				
+			}
+			public void setrX(int input) {
+				rectAngular.setX(input);
+			}
+
+			public void setrY(int input) {
+				rectAngular.setY(input);
+			}
+
+			public void setrZ(int input) {
+				rectAngular.setZ(input);
+			}
+
+			public void settX(int input) {
+				angular.setPhi(input);
+			}
+
+			public void settY(int input) {
+				angular.setTheta(input);
+			}
+
+			public int[] getPosition() {
+				return rectAngular.getPosition();
+			}
+
+			public int getTheta() {
+				return angular.getTheta();
+			}
+
+			public int getPhi() {
+				return angular.getPhi();
+			}
+		}
+
+	    // Inner class of RobotAngle contains yaw and pitch
+		class RobotAngle {
+
+			private int theta;
+			private int phi;
+
+			public RobotAngle(int theta, int phi) {
+				this.theta = theta;
+				this.phi = phi;
+			}
+
+			public RobotAngle() {
+				// Initialize the RobotAngle with (0,0)
+				this.theta = 0;
+				this.phi = 0;
+			}
+
+			// basic void function set and get angle
+			public void setTheta(int angle) {
+				this.theta = angle;
+			}
+
+			public void setPhi(int angle) {
+				this.phi = angle;
+			}
+
+			public int getTheta() {
+				return this.theta;
+			}
+
+			public int getPhi() {
+				return this.phi;
+			}
+
+		}
+
+	    // Inner class of Robot Position contains X, Y and Z
+		class RobotPosition {
+			private int X;
+			private int Y;
+			private int Z;
+			private int[] robotposi = new int[3];
+
+			public RobotPosition(int X, int Y, int Z) {
+				this.X = X;
+				this.Y = Y;
+				this.Z = Z;
+			}
+
+			public RobotPosition() {
+				this.X = 0;
+				this.Y = 0;
+				this.Z = 0;
+			}
+
+			// basic void to set and get position
+			public void setX(int position) {
+				this.X = position;
+			}
+
+			public void setY(int position) {
+				this.Y = position;
+			}
+
+			public void setZ(int position) {
+				this.Z = position;
+			}
+
+			public int[] getPosition() {
+				this.robotposi[1] = X;
+				this.robotposi[2] = Y;
+				this.robotposi[3] = Z;
+				return this.robotposi;
+			}
+		}
+
+}

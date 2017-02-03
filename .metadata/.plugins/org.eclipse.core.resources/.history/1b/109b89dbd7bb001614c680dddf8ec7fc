@@ -1,0 +1,16 @@
+
+public class JavaRobotServo extends SendUDP {
+
+	private Boolean status = new Boolean(false);
+
+	// private constructor JavaRobotAlert Read
+
+	JavaRobotServo(int i) {
+		super((i+3));// Servo 4: ON / 5: OFF
+	}
+
+	public Boolean makeServo(int index) {
+		
+	}
+	
+}

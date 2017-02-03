@@ -1,0 +1,32 @@
+
+public class JavaRobotAlert extends SendUDP {
+
+    private String alert = new String();
+
+    // private constructor JavaRobotAlert Read
+    private JavaRobotAlert() {
+    	super(2);//Read Alert
+    }
+
+    private JavaRobotAlert(int i) {
+    	super(3);//Reset Alert
+    }
+
+    public static JavaRobotAlert makeAlert(int index){
+	switch(index){
+	case 1://read alert
+	    return new JavaRobotAlert();
+	case 2://reset alert
+	    return new JavaRobotAlert(1);
+	default://reset alert
+	    return new JavaRobotAlert(1);
+	}
+    }
+
+    public String call() {
+    	alert = "";
+    	
+    	return alert;
+    }
+
+}

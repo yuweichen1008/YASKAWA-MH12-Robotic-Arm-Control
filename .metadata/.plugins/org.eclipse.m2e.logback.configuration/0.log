@@ -1,0 +1,41 @@
+2016-11-18 10:38:17,312 [Worker-3] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-12-03 15:42:10,201 [Thread-7] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-03 15:42:15,246 [Worker-12] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-12-05 23:35:58,859 [Worker-1] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2016-12-05 23:36:00,595 [Thread-9] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-07 00:34:38,320 [Worker-2] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2016-12-07 00:34:40,235 [Thread-9] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-07 00:48:05,205 [Worker-1] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-12-07 00:48:06,870 [Thread-8] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-07 01:57:50,475 [Worker-0] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-12-07 01:57:51,683 [Thread-9] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-07 14:37:18,228 [Worker-2] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-12-07 14:37:19,645 [Thread-8] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-09 00:32:51,078 [Worker-2] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2016-12-09 00:32:53,012 [Thread-10] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-09 13:48:26,520 [Thread-6] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-09 13:48:31,460 [Worker-0] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2016-12-12 13:05:01,671 [Thread-6] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-12 13:05:05,418 [Worker-1] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2016-12-12 15:32:35,061 [Thread-6] ERROR org.eclipse.jgit.util.FS - error: cannot spawn echo: No such file or directory
+error: unable to start editor 'echo'
+
+2016-12-12 15:32:39,146 [Worker-4] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.

@@ -1,0 +1,40 @@
+
+public interface RobotTool {
+	public int toolnumber;
+	public int formnumber;
+	public int tZ;
+
+
+	public void setrX(int input) {
+		rectAngular.setX(input);
+	}
+
+	public void setrY(int input) {
+		rectAngular.setY(input);
+	}
+
+	public void setrZ(int input) {
+		rectAngular.setZ(input);
+	}
+
+	public void settX(int input) {
+		angular.setPhi(input);
+	}
+
+	public void settY(int input) {
+		angular.setTheta(input);
+	}
+
+	public int[] getPosition() {
+		return RobotPosition.getPosition();
+	}
+
+	public int getTheta() {
+		return angular.getTheta();
+	}
+
+	public int getPhi() {
+		return angular.getPhi();
+	}
+
+}
